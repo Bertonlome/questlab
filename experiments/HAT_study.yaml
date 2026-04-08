@@ -22,6 +22,7 @@ conditions:
   TARS:
     questionnaires:
       - nasa_tlx_evaluation
+      - perceived_control
       - oversight_bespoke
       - trust_risk_bespoke
       - checklist_for_trust_jian_et_al_2000
@@ -29,6 +30,7 @@ conditions:
   TARP-F:
     questionnaires:
       - nasa_tlx_evaluation
+      - perceived_control
       - oversight_bespoke
       - trust_risk_bespoke
       - checklist_for_trust_jian_et_al_2000
@@ -36,6 +38,7 @@ conditions:
   TARP-S:
     questionnaires:
       - nasa_tlx_evaluation
+      - perceived_control
       - oversight_bespoke
       - trust_risk_bespoke
       - checklist_for_trust_jian_et_al_2000

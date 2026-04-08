@@ -1,0 +1,60 @@
+id:
+short_tia_scale
+name: "Short Trust in Automation Scale"
+language: en
+instructions: >
+  For each statement below, select the response that best reflects your experience
+  with the system during the session.
+
+# YAML anchor — reused by every question via *sta_anchors
+_sta_anchors: &sta_anchors
+  - "Strongly Disagree"
+  - "Disagree"
+  - "Neutral"
+  - "Agree"
+  - "Strongly Agree"
+
+# Attention check — inserted at a random position among the questions at runtime.
+# correct_value: 1-based index of the correct radio option (3 = "Neutral").
+attention_check:
+  id: sta_attention_check
+  type: likert5
+  label: >
+    I select "Neutral" to confirm that I am carefully answering this survey.
+    (attention check)
+  anchors: *sta_anchors
+  correct_value: 3
+
+questions:
+
+  -id: sta_item_1
+    type: likert5
+    label: "I believe the autonomous system is a competent performer"
+    anchors: *sta_anchors
+    required: true
+
+  -id: sta_item_2
+    type: likert5
+    label: "I trust the autonomous system"
+    anchors: *sta_anchors
+    required: true
+  -id: sta_item_3
+    type: likert5
+    label: "I have confidence in the advice given by the autonomous system"
+    anchors: *sta_anchors
+    required: true
+  -id: sta_item_4
+    type: likert5
+    label: "I can depend on the autonomous system"
+    anchors: *sta_anchors
+    required: true
+  -id: sta_item_5
+    type: likert5
+    label: "I can rely on the autonomous system to behave in consistent ways"
+    anchors: *sta_anchors
+    required: true
+  -id: sta_item_6
+    type: likert5
+    label: "I can rely on the autonomous system to do its best every time I take its advice"
+    anchors: *sta_anchors
+    required: true

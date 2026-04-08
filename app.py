@@ -5,6 +5,8 @@ import uuid
 import sqlite3
 import socket
 import io
+import random
+import hashlib
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -246,6 +248,29 @@ def questionnaire(session_id, q_index):
     form_id = form_list[q_index]
     form    = _load_form(form_id)
 
+    # Inject attention check at a stable random position (deterministic per session+form)
+    attention_check_id      = None
+    attention_check_correct = None
+    if form.get("attention_check"):
+        ac_cfg = form["attention_check"]
+        # Build the question dict — exclude internal-only key "correct_value"
+        ac_q = {k: v for k, v in ac_cfg.items() if k != "correct_value"}
+        ac_q.setdefault("id", "_attention_check")
+        ac_q.setdefault("type", "likert5")
+        ac_q.setdefault("required", False)
+
+        attention_check_id      = ac_q["id"]
+        attention_check_correct = str(ac_cfg.get("correct_value", "5"))
+
+        # Stable shuffle: same position on every page refresh for this session+form
+        seed      = int(hashlib.md5(f"{session_id}{form_id}".encode()).hexdigest(), 16)
+        rng       = random.Random(seed)
+        questions = list(form["questions"])
+        pos       = rng.randint(0, len(questions))
+        questions.insert(pos, ac_q)
+        form = dict(form)
+        form["questions"] = questions
+
     # Reload any answers already autosaved (allows page refresh / resume)
     existing = {
         r["question_id"]: r["value"]
@@ -266,6 +291,8 @@ def questionnaire(session_id, q_index):
         form_id=form_id,
         existing=existing,
         participant=session["participant"],
+        attention_check_id=attention_check_id,
+        attention_check_correct=attention_check_correct,
     )
 
 

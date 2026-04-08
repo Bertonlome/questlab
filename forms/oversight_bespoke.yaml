@@ -9,6 +9,17 @@ instructions: >
 instructions_en: >
   Please indicate how much you agree with each statement by checking one box.
 
+# Attention check — inserted at a random position among the questions at runtime.
+# correct_value: 1-based index of the correct radio option (5 = "Strongly Agree").
+attention_check:
+  id: ob_attention_check
+  type: likert5
+  label: >
+    Je coche "D'accord" pour confirmer que je réponds attentivement à ce questionnaire.
+  label_en: >
+    I select "Agree" to confirm that I am carefully answering this survey.
+  correct_value: 4
+
 questions:
 
   - id: ob_a1

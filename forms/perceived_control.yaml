@@ -1,0 +1,25 @@
+id: perceived_control
+name: "Perceived Control"
+language: fr
+instructions: >
+  Veuillez indiquer dans quelle mesure vous êtes d'accord ou en désaccord avec les affirmations suivantes
+  concernant votre expérience lors de la session.
+instructions_en: >
+  Please indicate how much you agree or disagree with the following statements
+  regarding your experience during the session.
+
+questions:
+
+  - id: pc_01
+    type: likert5
+    label: "Je me sens en contrôle lorsque j'utilise ce système autonome."
+    label_en: "I feel in control while using this autonomous system."
+  - id: pc_02
+    type: likert5
+    label: "Je sens que je peux contrôler la façon dont le système autonome se comporte."
+    label_en: "I feel I can control the way that the autonomous system behaves."
+  - id: pc_03
+    type: likert5
+    label: "J'ai les ressources et la capacité pour faire usage de ce système autonome."
+    label_en: "I have the resources and the ability to make use of this autonomous system."
+    

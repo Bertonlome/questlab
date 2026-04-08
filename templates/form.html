@@ -64,7 +64,8 @@
     <form method="POST" action="/submit/{{ session_id }}/{{ q_index }}">
 
       {% for q in form.questions %}
-      <div class="question">
+      <div class="question{% if q.id == attention_check_id %} attention-check-item{% endif %}"
+           {% if q.id == attention_check_id %}data-attention-check-correct="{{ attention_check_correct }}"{% endif %}>
         <div class="question-label">
           <span class="lang-primary">{{ q.label }}</span>
           {% if form.bilingual and q.get('label' ~ _alt_sfx) %}
@@ -319,6 +320,27 @@
         if (firstMissing) {
           e.preventDefault();
           firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
+        // Attention check — warn if answered incorrectly, but don't block submission
+        const acCard = document.querySelector('.attention-check-item[data-attention-check-correct]');
+        if (acCard) {
+          const correctVal = acCard.dataset.attentionCheckCorrect;
+          const acInput    = acCard.querySelector('input[type=radio]');
+          if (acInput) {
+            const selected = document.querySelector(
+              'input[name="' + CSS.escape(acInput.name) + '"]:checked'
+            );
+            if (!selected || selected.value !== correctVal) {
+              e.preventDefault();
+              alert(
+                'Attention check: please make sure to read each statement carefully ' +
+                'and answer accurately before continuing.'
+              );
+              acCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }
         }
       });
 

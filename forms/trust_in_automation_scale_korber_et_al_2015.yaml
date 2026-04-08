@@ -13,6 +13,17 @@ _kta_anchors: &kta_anchors
   - "Rather Agree"
   - "Strongly Agree"
 
+# Attention check — inserted at a random position among the questions at runtime.
+# correct_value: 1-based index of the correct radio option (5 = "Strongly Agree").
+attention_check:
+  id: kta_attention_check
+  type: likert5
+  label: >
+    I select "Strongly Agree" to confirm that I am carefully answering this survey.
+    (attention check)
+  anchors: *kta_anchors
+  correct_value: 5
+
 questions:
 
   - id: kta_01
