@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ form.name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+
+    <div class="session-header">
+      <span>Participant: <strong>{{ participant }}</strong></span>
+      <span>{{ experiment.name }}{% if experiment.condition %} &mdash; {{ experiment.condition }}{% endif %}</span>
+    </div>
+
+    <div class="steps">
+      {% for i in range(total) %}
+        {% if i < q_index %}
+        <div class="step step-done" title="Questionnaire {{ i + 1 }} complete">
+          <div class="step-circle">&#10003;</div>
+          <div class="step-label">{{ i + 1 }}</div>
+        </div>
+        {% elif i == q_index %}
+        <div class="step step-current" title="Questionnaire {{ i + 1 }} (current)">
+          <div class="step-circle">{{ i + 1 }}</div>
+          <div class="step-label">{{ i + 1 }}</div>
+        </div>
+        {% else %}
+        <div class="step step-todo" title="Questionnaire {{ i + 1 }} upcoming">
+          <div class="step-circle">{{ i + 1 }}</div>
+          <div class="step-label">{{ i + 1 }}</div>
+        </div>
+        {% endif %}
+        {% if not loop.last %}<div class="step-line{% if i < q_index %} step-line-done{% endif %}"></div>{% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="form-title-row">
+      {# _alt_sfx: dynamic suffix for the non-primary language field names #}
+      {% set _alt_sfx = '_fr' if form.get('language', 'en') == 'en' else '_en' %}
+      <h1>
+        <span class="lang-primary">{{ form.name }}</span>
+        {% if form.bilingual %}<span class="lang-alt">{{ form.get('name' ~ _alt_sfx, form.name) }}</span>{% endif %}
+      </h1>
+      {% if form.bilingual %}
+      <button type="button" class="lang-toggle" id="langToggle"
+              data-primary="{{ form.get('language', 'en') | upper }}"
+              data-alt="{{ 'EN' if form.get('language', 'en') == 'fr' else 'FR' }}">
+        {{ 'EN' if form.get('language', 'en') == 'fr' else 'FR' }}
+      </button>
+      {% endif %}
+    </div>
+
+    {% if form.instructions %}
+    <div class="instructions">
+      <span class="lang-primary">{{ form.instructions }}</span>
+      {% if form.bilingual and form.get('instructions' ~ _alt_sfx) %}
+      <span class="lang-alt">{{ form.get('instructions' ~ _alt_sfx) }}</span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/submit/{{ session_id }}/{{ q_index }}">
+
+      {% for q in form.questions %}
+      <div class="question">
+        <div class="question-label">
+          <span class="lang-primary">{{ q.label }}</span>
+          {% if form.bilingual and q.get('label' ~ _alt_sfx) %}
+          <span class="lang-alt">{{ q.get('label' ~ _alt_sfx) }}</span>
+          {% endif %}
+          {% if q.get('required', true) != false %}<span class="required">*</span>{% endif %}
+        </div>
+        {% if q.description or (form.bilingual and q.get('description' ~ _alt_sfx)) %}
+        <div class="question-description">
+          {% if q.description %}<span class="lang-primary">{{ q.description }}</span>{% endif %}
+          {% if form.bilingual and q.get('description' ~ _alt_sfx) %}<span class="lang-alt">{{ q.get('description' ~ _alt_sfx) }}</span>{% endif %}
+        </div>
+        {% endif %}
+
+        {# ── LIKERT 5 or 7 ─────────────────────────────────────── #}
+        {% if q.type in ('likert5', 'likert7') %}
+          {% set points      = 5 if q.type == 'likert5' else 7 %}
+          {% set _lang       = form.get('language', 'en') %}
+          {% set _preset     = LIKERT_ANCHORS.get(_lang, LIKERT_ANCHORS['en']) %}
+          {% set _alt_lang   = 'en' if _lang == 'fr' else 'fr' %}
+          {% set _alt_preset = LIKERT_ANCHORS.get(_alt_lang, LIKERT_ANCHORS['en']) %}
+          {% set anchors     = q.anchors if q.get('anchors') else _preset.get(q.type, _preset['likert5']) %}
+          {% set anchors_alt = q.get('anchors' ~ _alt_sfx) if q.get('anchors' ~ _alt_sfx) else _alt_preset.get(q.type, _alt_preset['likert5']) %}
+          <div class="likert likert-{{ points }}">
+            {% for i in range(1, points + 1) %}
+            <label class="likert-option">
+              <input type="radio" name="{{ q.id }}" value="{{ i }}"
+                {% if existing.get(q.id) == i|string %}checked{% endif %}
+                {% if q.get('required', true) != false %}required{% endif %}>
+              <span class="likert-btn">{{ i }}</span>
+              <span class="likert-label">
+                <span class="lang-primary">{{ anchors[loop.index0] }}</span>
+                {% if form.bilingual %}<span class="lang-alt">{{ anchors_alt[loop.index0] }}</span>{% endif %}
+              </span>
+            </label>
+            {% endfor %}
+          </div>
+
+        {# ── VAS (Visual Analogue Scale) ────────────────────────── #}
+        {% elif q.type == 'vas' %}
+          {% set vas_min    = q.get('min', 0) %}
+          {% set vas_max    = q.get('max', 100) %}
+          {% set vas_mid    = ((vas_min + vas_max) / 2) | int %}
+          {% set saved      = existing.get(q.id) %}
+          {% set is_pristine = not saved %}
+          {% set cur        = saved if saved else vas_mid | string %}
+          <div class="vas-wrapper">
+            <div class="vas-labels">
+              <span>{{ q.get('min_label', vas_min | string) }}</span>
+              <span>{{ q.get('max_label', vas_max | string) }}</span>
+            </div>
+            <input type="range" name="{{ q.id }}"
+                   min="{{ vas_min }}" max="{{ vas_max }}" value="{{ cur }}"
+                   {% if is_pristine %}data-pristine{% endif %}
+                   {% if q.get('required', true) != false %}data-required{% endif %}>
+            <div class="vas-value" id="{{ q.id }}_display">
+              {% if is_pristine %}
+              <span class="vas-hint">Drag the slider to set a value</span>
+              {% else %}
+              {{ cur }}
+              {% endif %}
+            </div>
+          </div>
+
+        {# ── SINGLE CHOICE ──────────────────────────────────────── #}
+        {% elif q.type == 'single_choice' %}
+          <div class="choice-list">
+            {% for i in range(q.options | length) %}
+            <label class="choice-option">
+              <input type="radio" name="{{ q.id }}" value="{{ q.options[i] }}"
+                {% if existing.get(q.id) == q.options[i] %}checked{% endif %}
+                {% if q.get('required', true) != false %}required{% endif %}>
+              <span class="lang-primary">{{ q.options[i] }}</span>
+              {% if form.bilingual and q.get('options' ~ _alt_sfx) %}
+              <span class="lang-alt">{{ q.get('options' ~ _alt_sfx)[i] }}</span>
+              {% endif %}
+            </label>
+            {% endfor %}
+          </div>
+
+        {# ── MULTI CHOICE ───────────────────────────────────────── #}
+        {% elif q.type == 'multi_choice' %}
+          {% set saved = existing.get(q.id, '[]') | from_json %}
+          <div class="choice-list">
+            {% for i in range(q.options | length) %}
+            <label class="choice-option">
+              <input type="checkbox" name="{{ q.id }}" value="{{ q.options[i] }}"
+                {% if q.options[i] in saved %}checked{% endif %}>
+              <span class="lang-primary">{{ q.options[i] }}</span>
+              {% if form.bilingual and q.get('options' ~ _alt_sfx) %}
+              <span class="lang-alt">{{ q.get('options' ~ _alt_sfx)[i] }}</span>
+              {% endif %}
+            </label>
+            {% endfor %}
+          </div>
+
+        {# ── FREE TEXT ──────────────────────────────────────────── #}
+        {% elif q.type == 'free_text' %}
+          <textarea name="{{ q.id }}"
+                    rows="{{ q.get('rows', 4) }}"
+                    placeholder="{{ q.get('placeholder', '') }}"
+                    {% if q.get('required', true) != false %}required{% endif %}>{{ existing.get(q.id, '') }}</textarea>
+
+        {# ── NUMBER ─────────────────────────────────────────────── #}
+        {% elif q.type == 'number' %}
+          <input type="number" name="{{ q.id }}"
+                 value="{{ existing.get(q.id, '') }}"
+                 {% if q.get('min') is not none %}min="{{ q.min }}"{% endif %}
+                 {% if q.get('max') is not none %}max="{{ q.max }}"{% endif %}
+                 step="{{ q.get('step', 1) }}"
+                 placeholder="{{ q.get('placeholder', '') }}"
+                 {% if q.get('required', true) != false %}required{% endif %}>
+
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <button type="submit" class="submit-btn">
+        {% if q_index + 1 < total %}Continue &#8594;{% else %}Finish &#10003;{% endif %}
+      </button>
+
+    </form>
+  </div>
+
+  {# Floating save indicator #}
+  <div class="save-indicator" id="saveIndicator"></div>
+
+  <script>
+    const SESSION_ID       = {{ session_id | tojson }};
+    const QUESTIONNAIRE_ID = {{ form_id | tojson }};
+
+    let debounceTimers = {};
+    let indicatorTimer = null;
+
+    function showSaved(ok) {
+      const el = document.getElementById('saveIndicator');
+      el.textContent   = ok ? '\u2713 Saved' : '\u26a0 Save failed';
+      el.className     = 'save-indicator visible' + (ok ? '' : ' error');
+      clearTimeout(indicatorTimer);
+      indicatorTimer   = setTimeout(() => el.classList.remove('visible'), 1600);
+    }
+
+    function saveAnswer(questionId, value) {
+      fetch('/autosave', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          session_id:       SESSION_ID,
+          questionnaire_id: QUESTIONNAIRE_ID,
+          question_id:      questionId,
+          value:            value
+        })
+      })
+      .then(r => r.json())
+      .then(d => showSaved(d.ok))
+      .catch(() => showSaved(false));
+    }
+
+    function debounce(questionId, value, delay) {
+      clearTimeout(debounceTimers[questionId]);
+      debounceTimers[questionId] = setTimeout(() => saveAnswer(questionId, value), delay);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // Language toggle
+      const langToggle = document.getElementById('langToggle');
+      if (langToggle) {
+        langToggle.addEventListener('click', () => {
+          const isAlt = document.body.classList.toggle('lang-alt-active');
+          langToggle.textContent = isAlt
+            ? langToggle.dataset.primary
+            : langToggle.dataset.alt;
+        });
+      }
+
+      // Text inputs & textareas — debounced at 500 ms
+      document.querySelectorAll('textarea, input[type=text], input[type=number]').forEach(el => {
+        el.addEventListener('input', () => debounce(el.name, el.value, 500));
+      });
+
+      // VAS range — pristine until first touch, then live update + save
+      document.querySelectorAll('input[type=range]').forEach(el => {
+        const display = document.getElementById(el.name + '_display');
+
+        function activateVas() {
+          if (!el.hasAttribute('data-pristine')) return;
+          el.removeAttribute('data-pristine');
+          if (display) display.textContent = el.value;
+        }
+
+        el.addEventListener('input', () => {
+          activateVas();
+          if (display) display.textContent = el.value;
+          debounce(el.name, el.value, 200);
+        });
+        // Pointer/touch release — catches tap without drag on mobile
+        el.addEventListener('change', () => {
+          activateVas();
+          saveAnswer(el.name, el.value);
+        });
+      });
+
+      // Block submit if any required question is unanswered
+      document.querySelector('form').addEventListener('submit', function (e) {
+        let firstMissing = null;
+
+        document.querySelectorAll('.question').forEach(card => {
+          card.classList.remove('question-error');
+          card.querySelector('.question-error-msg')?.remove();
+        });
+
+        // Required radio groups (likert + single_choice) — check at least one selected
+        const radioGroups = {};
+        document.querySelectorAll('input[type=radio]').forEach(el => {
+          radioGroups[el.name] = radioGroups[el.name] || { el, checked: false };
+          if (el.checked) radioGroups[el.name].checked = true;
+        });
+        Object.values(radioGroups).forEach(({ el, checked }) => {
+          if (!checked) {
+            const card = el.closest('.question');
+            if (card && !card.classList.contains('question-error')) {
+              card.classList.add('question-error');
+              _addErrorMsg(card);
+              if (!firstMissing) firstMissing = card;
+            }
+          }
+        });
+
+        // Required textareas and number inputs
+        document.querySelectorAll('textarea[required], input[type=number][required]').forEach(el => {
+          if (!el.value.trim()) {
+            const card = el.closest('.question');
+            if (card && !card.classList.contains('question-error')) {
+              card.classList.add('question-error');
+              _addErrorMsg(card);
+              if (!firstMissing) firstMissing = card;
+            }
+          }
+        });
+
+        // Required VAS that hasn't been touched
+        document.querySelectorAll('input[type=range][data-pristine][data-required]').forEach(el => {
+          const card = el.closest('.question');
+          if (card && !card.classList.contains('question-error')) {
+            card.classList.add('question-error');
+            _addErrorMsg(card);
+            if (!firstMissing) firstMissing = card;
+          }
+        });
+
+        if (firstMissing) {
+          e.preventDefault();
+          firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+
+      function _addErrorMsg(card) {
+        const msg = document.createElement('div');
+        msg.className = 'question-error-msg';
+        msg.textContent = 'This question requires an answer.';
+        card.appendChild(msg);
+      }
+
+      // Clear error state as soon as any input is touched
+      document.querySelectorAll('input, textarea').forEach(el => {
+        el.addEventListener('change', () => {
+          const card = el.closest('.question');
+          if (card) {
+            card.classList.remove('question-error');
+            card.querySelector('.question-error-msg')?.remove();
+          }
+        });
+        el.addEventListener('input', () => {
+          const card = el.closest('.question');
+          if (card) {
+            card.classList.remove('question-error');
+            card.querySelector('.question-error-msg')?.remove();
+          }
+        });
+      });
+
+      // Radio buttons — save immediately on selection
+      document.querySelectorAll('input[type=radio]').forEach(el => {
+        el.addEventListener('change', () => saveAnswer(el.name, el.value));
+      });
+
+      // Checkboxes — collect all checked values for the group
+      document.querySelectorAll('input[type=checkbox]').forEach(el => {
+        el.addEventListener('change', () => {
+          const checked = Array.from(
+            document.querySelectorAll('input[name="' + CSS.escape(el.name) + '"]:checked')
+          ).map(c => c.value);
+          saveAnswer(el.name, checked);
+        });
+      });
+
+    });
+  </script>
+</body>
+</html>

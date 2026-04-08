@@ -1,0 +1,33 @@
+id: trust_propensity
+name: "Propensity to Trust Scale"
+language: en
+
+questions:
+
+  - id: trust_1
+    type: likert5
+    label: "I usually trust machines until there is a reason not to."
+
+  - id: trust_2
+    type: likert5
+    label: "For the most part, I distrust machines."
+
+  - id: trust_3
+    type: likert5
+    label: "In general, I would rely on a machine to assist me."
+
+  - id: trust_4
+    type: likert5
+    label: "My tendency to trust machines is high."
+
+  - id: trust_5
+    type: likert5
+    label: "It is easy for me to trust machines to do their job."
+
+  - id: trust_6
+    type: likert5
+    label: "I am likely to trust a machine even when I have little knowledge about it."
+
+  - id: trust_7
+    type: likert5
+    label: "I have a generally positive attitude toward advanced automation in aviation."

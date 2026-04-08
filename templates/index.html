@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuickWebForms</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="start-card">
+      <h1>QuickWebForms</h1>
+      <p>Enter your participant code and select the experiment to begin.</p>
+
+      {% if not experiments %}
+      <div class="no-experiments">
+        No experiment files found in <code>experiments/</code>.<br>
+        Add a <code>.yaml</code> file to get started.
+      </div>
+      {% else %}
+      <form method="POST" action="/start">
+        <div class="form-group">
+          <label for="participant">Participant Code</label>
+          <input type="text" id="participant" name="participant"
+                 placeholder="e.g. P012" required autofocus autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="experiment_id">Experiment</label>
+          <select id="experiment_id" name="experiment_id" required>
+            <option value="" disabled selected>Select an experiment…</option>
+            {% for exp in experiments %}
+            <option value="{{ exp }}">{{ exp }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group" id="condition-group" style="display:none">
+          <label for="condition">Condition</label>
+          <select id="condition" name="condition" required>
+            <option value="" disabled selected>Select a condition…</option>
+          </select>
+        </div>
+        <button type="submit" class="start-btn">Start &#8594;</button>
+      </form>
+      <script>
+        const allConditions = {{ all_conditions | tojson }};
+        const expSelect  = document.getElementById('experiment_id');
+        const condGroup  = document.getElementById('condition-group');
+        const condSelect = document.getElementById('condition');
+        expSelect.addEventListener('change', function () {
+          const conditions = allConditions[this.value] || [];
+          condSelect.innerHTML = '<option value="" disabled selected>Select a condition…</option>';
+          conditions.forEach(function (c) {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            condSelect.appendChild(opt);
+          });
+          if (conditions.length > 1) {
+            condGroup.style.display = '';
+            condSelect.required = true;
+          } else if (conditions.length === 1) {
+            condSelect.value = conditions[0];
+            condGroup.style.display = 'none';
+            condSelect.required = false;
+          } else {
+            condGroup.style.display = 'none';
+          }
+        });
+      </script>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

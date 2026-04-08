@@ -1,0 +1,74 @@
+id: nasa_tlx
+name: "NASA Task Load Index"
+instructions: >
+  Rate each of the following scales with respect to the task you just performed.
+  Mark each scale at the point that best indicates your experience of that dimension.
+
+questions:
+
+  - id: mental_demand
+    type: vas
+    label: "Mental Demand"
+    description: >
+      How much mental and perceptual activity was required?
+      Was the task easy or demanding, simple or complex, exacting or forgiving?
+    min: 0
+    max: 20
+    min_label: "Low"
+    max_label: "High"
+
+  - id: physical_demand
+    type: vas
+    label: "Physical Demand"
+    description: >
+      How much physical activity was required?
+      Was the task easy or demanding, slow or brisk, slack or strenuous, restful or laborious?
+    min: 0
+    max: 20
+    min_label: "Low"
+    max_label: "High"
+
+  - id: temporal_demand
+    type: vas
+    label: "Temporal Demand"
+    description: >
+      How much time pressure did you feel due to the rate or pace at which the
+      task elements occurred? Was the pace slow and leisurely or rapid and frantic?
+    min: 0
+    max: 20
+    min_label: "Low"
+    max_label: "High"
+
+  - id: performance
+    type: vas
+    label: "Performance"
+    description: >
+      How successful do you think you were in accomplishing the goals set by the
+      experimenter? How satisfied were you with your performance?
+      ⚠ Note: this scale is reversed — a high score indicates poor performance.
+    min: 0
+    max: 20
+    min_label: "Good"
+    max_label: "Poor"
+
+  - id: effort
+    type: vas
+    label: "Effort"
+    description: >
+      How hard did you have to work (mentally and physically) to accomplish your
+      level of performance?
+    min: 0
+    max: 20
+    min_label: "Low"
+    max_label: "High"
+
+  - id: frustration
+    type: vas
+    label: "Frustration Level"
+    description: >
+      How insecure, discouraged, irritated, stressed and annoyed were you versus
+      secure, gratified, content, relaxed and complacent during the task?
+    min: 0
+    max: 20
+    min_label: "Low"
+    max_label: "High"

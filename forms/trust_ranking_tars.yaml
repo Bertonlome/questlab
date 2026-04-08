@@ -1,0 +1,44 @@
+id: trust_ranking_tars
+name: "Classement des systèmes par confiance"
+name_en: "System Trust Ranking"
+language: fr
+bilingual: true
+instructions: |
+  Vous venez de tester 3 systèmes qui vous ont aidé à effectuer la tâche chacun à sa façon. Les trois systèmes sont décrits ci-dessous :
+
+  TARS : Le système supporte mais n'agit pas.
+  TARP-F : Le système agit rapidement.
+  TARP-S : Le système agit en respectant un certain délai avant et après ses actions.
+
+  Veuillez attribuer un rang à chaque système selon votre niveau de confiance envers lui. Utilisez chaque rang une seule fois : 1 = confiance la plus élevée, 3 = confiance la plus basse.
+instructions_en: |
+  You have just tested 3 systems, each of which helped you perform the task in its own way. The three systems are described below:
+
+  TARS: The system supports but does not act.
+  TARP-F: The system acts quickly.
+  TARP-S: The system acts while respecting a certain delay before and after its actions.
+
+  Please assign a rank to each system based on your level of trust in it. Use each rank only once: 1 = highest trust, 3 = lowest trust.
+
+questions:
+
+  - id: rank_tars
+    type: single_choice
+    label: "TARS — Le système supporte mais n'agit pas."
+    label_en: "TARS — The system supports but does not act."
+    description: "Rang / Rank"
+    options: ["1", "2", "3"]
+
+  - id: rank_tarpf
+    type: single_choice
+    label: "TARP-F — Le système agit rapidement."
+    label_en: "TARP-F — The system acts quickly."
+    description: "Rang / Rank"
+    options: ["1", "2", "3"]
+
+  - id: rank_tarps
+    type: single_choice
+    label: "TARP-S — Le système agit en respectant un certain délai avant et après ses actions."
+    label_en: "TARP-S — The system acts while respecting a certain delay before and after its actions."
+    description: "Rang / Rank"
+    options: ["1", "2", "3"]

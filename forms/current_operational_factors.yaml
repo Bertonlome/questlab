@@ -1,0 +1,61 @@
+id: current_operational_factors
+name: "Facteurs opérationnels immédiats"
+name_en: "Current Operational Factors"
+language: fr
+bilingual: true
+
+questions:
+
+  - id: fatigue_level
+    type: single_choice
+    label: "À quel point vous sentez-vous fatigué(e) en ce moment ?"
+    label_en: "How fatigued do you feel right now?"
+    options:
+      - "Pas du tout fatigué(e)"
+      - "Peu fatigué(e)"
+      - "Moyennement fatigué(e)"
+      - "Très fatigué(e)"
+      - "Extrêmement fatigué(e)"
+    options_en:
+      - "Not at all fatigued"
+      - "Slightly fatigued"
+      - "Moderately fatigued"
+      - "Very fatigued"
+      - "Extremely fatigued"
+
+  - id: sleep_quality
+    type: single_choice
+    label: "Quelle a été votre qualité de sommeil la veille ?"
+    label_en: "How would you rate your sleep quality last night?"
+    options:
+      - "Très mauvaise"
+      - "Mauvaise"
+      - "Moyenne"
+      - "Bonne"
+      - "Très bonne"
+    options_en:
+      - "Very poor"
+      - "Poor"
+      - "Fair"
+      - "Good"
+      - "Very good"
+
+  - id: hours_since_coffee
+    type: number
+    label: "Nombre d'heures depuis le dernier café"
+    label_en: "Hours since last coffee"
+    min: 0
+    max: 24
+    step: 1
+    placeholder: "0"
+    required: false
+
+  - id: cups_of_coffee_today
+    type: number
+    label: "Combien de tasses de café avez-vous consommé aujourd'hui ?"
+    label_en: "How many cups of coffee have you had today?"
+    min: 0
+    max: 20
+    step: 1
+    placeholder: "0"
+    required: false

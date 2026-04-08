@@ -1,0 +1,46 @@
+id: autonomous_systems_and_vocal_commands_familiarity
+name: "Familiarité avec systèmes autonomes et à commandes vocales"
+name_en: "Familiarity with Autonomous Systems and Voice Commands"
+language: fr
+bilingual: true
+
+questions:
+
+  - id: used_similar
+    type: likert5
+    label: "J'ai déjà utilisé des systèmes similaires."
+    label_en: "I have already used similar systems."
+
+  - id: voice_assistant_freq
+    type: single_choice
+    label: "Quelle est votre fréquence d'utilisation des assistants vocaux comme Siri, Alexa ou Google Assistant ?"
+    label_en: "How often do you use voice assistants like Siri, Alexa or Google Assistant?"
+    options:
+      - "Jamais"
+      - "Rarement (<1 fois par semaine)"
+      - "Occasionnellement (1–3 fois par semaine)"
+      - "Fréquemment (4–6 fois par semaine)"
+      - "Très fréquemment (1 fois par jour ou plus)"
+    options_en:
+      - "Never"
+      - "Rarely (<1 time per week)"
+      - "Occasionally (1–3 times per week)"
+      - "Frequently (4–6 times per week)"
+      - "Very frequently (once a day or more)"
+
+  - id: voice_commands_freq
+    type: single_choice
+    label: "Quelle est votre fréquence d'utilisation des commandes vocales (dictée de SMS, recherche) ?"
+    label_en: "How often do you use voice commands (SMS dictation, search)?"
+    options:
+      - "Jamais"
+      - "Rarement (<1 fois par semaine)"
+      - "Occasionnellement (1–3 fois par semaine)"
+      - "Fréquemment (4–6 fois par semaine)"
+      - "Très fréquemment (1 fois par jour ou plus)"
+    options_en:
+      - "Never"
+      - "Rarely (<1 time per week)"
+      - "Occasionally (1–3 times per week)"
+      - "Frequently (4–6 times per week)"
+      - "Very frequently (once a day or more)"

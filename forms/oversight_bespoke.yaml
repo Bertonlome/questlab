@@ -1,0 +1,70 @@
+id: oversight_bespoke
+name: "Supervision et Surveillance du Système"
+name_en: "Oversight of the System"
+language: fr
+bilingual: true
+instructions: >
+  Veuillez indiquer dans quelle mesure vous êtes en accord avec chacune des
+  affirmations suivantes en cochant une seule case.
+instructions_en: >
+  Please indicate how much you agree with each statement by checking one box.
+
+questions:
+
+  - id: ob_a1
+    type: likert5
+    label: "J'ai été capable de suivre en permanence ce que faisait le système."
+    label_en: "I was able to keep track of what the system was doing at all times."
+    description: "A. Conscience de la situation et suivi"
+    description_en: "A. Awareness & Monitoring"
+
+  - id: ob_a2
+    type: likert5
+    label: "J'avais suffisamment de temps et d'attention pour surveiller correctement le système."
+    label_en: "I had enough time and attention to monitor the system properly."
+
+  - id: ob_a3
+    type: likert5
+    label: "J'ai trouvé difficile de suivre la séquence d'actions effectuée par le système."
+    label_en: "I found it difficult to follow the sequence of actions performed by the system."
+
+  - id: ob_b1
+    type: likert5
+    label: "J'ai activement vérifié ou recoupé les actions du système."
+    label_en: "I actively verified or cross-checked the system's actions."
+    description: "B. Vérification et supervision"
+    description_en: "B. Verification & Supervision"
+
+  - id: ob_b2
+    type: likert5
+    label: "Il ne m'a pas semblé nécessaire de surveiller le système de près."
+    label_en: "It did not feel necessary to monitor the system closely."
+
+  - id: ob_b3
+    type: likert5
+    label: "Il est possible que j'aie manqué des occasions de vérifier ce que faisait le système."
+    label_en: "I may have missed opportunities to check what the system was doing."
+
+  - id: ob_c1
+    type: likert5
+    label: "Si le système avait commis une erreur, j'aurais été capable de la détecter rapidement."
+    label_en: "If the system made a mistake, I would be able to detect it quickly."
+    description: "C. Contrôle et capacité d'intervention"
+    description_en: "C. Control & Intervention"
+
+  - id: ob_c2
+    type: likert5
+    label: "J'avais suffisamment de temps pour réagir aux actions du système avant qu'elles ne soient complétées."
+    label_en: "I had enough time to react to the system's actions before they were completed."
+
+  - id: ob_d1
+    type: likert5
+    label: "Le système m'a permis de travailler plus efficacement."
+    label_en: "The system helped me work more efficiently."
+    description: "D. Compromis supervision – performance"
+    description_en: "D. Oversight Trade-off"
+
+  - id: ob_d2
+    type: likert5
+    label: "Le gain d'efficacité s'est fait au détriment de ma capacité de surveillance."
+    label_en: "Improving efficiency came at the cost of my ability to monitor the system."

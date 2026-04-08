@@ -1,0 +1,90 @@
+id: trust_in_automation_scale_korber_et_al_2015
+name: "Trust in Automation Scale (Körber et al., 2015)"
+language: en
+instructions: >
+  For each statement below, select the response that best reflects your experience
+  with the system during the session. Leave a question blank if you choose not to respond.
+
+# YAML anchor — reused by every question via *kta_anchors
+_kta_anchors: &kta_anchors
+  - "Strongly Disagree"
+  - "Rather Disagree"
+  - "Neither Disagree nor Agree"
+  - "Rather Agree"
+  - "Strongly Agree"
+
+questions:
+
+  - id: kta_01
+    type: likert5
+    label: "The system is capable of interpreting situations correctly."
+    anchors: *kta_anchors
+    required: false
+
+  - id: kta_02
+    type: likert5
+    label: "The system state was always clear to me."
+    anchors: *kta_anchors
+    required: false
+
+  - id: kta_03
+    type: likert5
+    label: "The system works reliably."
+    anchors: *kta_anchors
+    required: false
+
+  - id: kta_04
+    type: likert5
+    label: "The system reacts unpredictably."
+    anchors: *kta_anchors
+    required: false
+
+  - id: kta_05
+    type: likert5
+    label: "I trust the system."
+    anchors: *kta_anchors
+    required: false
+
+  - id: kta_06
+    type: likert5
+    label: "A system malfunction is likely."
+    anchors: *kta_anchors
+    required: false
+
+  - id: kta_07
+    type: likert5
+    label: "I was able to understand why things happened."
+    anchors: *kta_anchors
+    required: false
+
+  - id: kta_08
+    type: likert5
+    label: "The system is capable of taking over complicated tasks."
+    anchors: *kta_anchors
+    required: false
+
+  - id: kta_09
+    type: likert5
+    label: "I can rely on the system."
+    anchors: *kta_anchors
+    required: false
+
+  - id: kta_10
+    type: likert5
+    label: "The system might make sporadic errors."
+    anchors: *kta_anchors
+    description: >
+      Sporadic: occurring at irregular intervals or only in a few places; scattered or isolated.
+    required: false
+
+  - id: kta_11
+    type: likert5
+    label: "It is difficult to identify what the system will do next."
+    anchors: *kta_anchors
+    required: false
+
+  - id: kta_12
+    type: likert5
+    label: "I am confident about the system's capabilities."
+    anchors: *kta_anchors
+    required: false

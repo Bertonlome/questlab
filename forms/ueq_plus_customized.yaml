@@ -1,0 +1,99 @@
+id: ueq_plus_customized
+name: "Échelle d'utilisabilité du système"
+name_en: "System Usability Scale"
+language: fr
+bilingual: true
+instructions: |
+  Ce questionnaire se compose de paires de propriétés opposées que peut avoir le système. La gradation entre les contraires est représentée par des cercles. En cochant l'un de ces cercles, vous pouvez exprimer votre approbation d'un concept.
+
+  Exemple : si vous choisissez le cercle 2 sur une ligne "Attractif / Rébarbatif", cela indique que vous jugez le système plus attractif que rébarbatif.
+instructions_en: |
+  This questionnaire consists of pairs of opposing properties that the system may have. The gradation between opposites is represented by circles. By selecting one of these circles, you can express your level of agreement with a concept.
+
+  Example: if you select circle 2 on an "Attractive / Unattractive" row, this indicates that you consider the system more attractive than unattractive.
+
+questions:
+
+  - id: ueq_01
+    type: likert7
+    label: "Rapide / Lent"
+    label_en: "Fast / Slow"
+    anchors:    ["Rapide", "", "", "", "", "", "Lent"]
+    anchors_en: ["Fast",   "", "", "", "", "", "Slow"]
+
+  - id: ueq_02
+    type: likert7
+    label: "Inefficace / Efficace"
+    label_en: "Ineffective / Effective"
+    anchors:    ["Inefficace", "", "", "", "", "", "Efficace"]
+    anchors_en: ["Ineffective", "", "", "", "", "", "Effective"]
+
+  - id: ueq_03
+    type: likert7
+    label: "Pas pratique / Pratique"
+    label_en: "Impractical / Practical"
+    anchors:    ["Pas pratique", "", "", "", "", "", "Pratique"]
+    anchors_en: ["Impractical",  "", "", "", "", "", "Practical"]
+
+  - id: ueq_04
+    type: likert7
+    label: "Ordonné / Surchargé"
+    label_en: "Organized / Cluttered"
+    anchors:    ["Ordonné", "", "", "", "", "", "Surchargé"]
+    anchors_en: ["Organized", "", "", "", "", "", "Cluttered"]
+
+  - id: ueq_05
+    type: likert7
+    label: "Imprévisible / Prévisible"
+    label_en: "Unpredictable / Predictable"
+    anchors:    ["Imprévisible", "", "", "", "", "", "Prévisible"]
+    anchors_en: ["Unpredictable", "", "", "", "", "", "Predictable"]
+
+  - id: ueq_06
+    type: likert7
+    label: "Gênant / Utile"
+    label_en: "Obstructive / Helpful"
+    anchors:    ["Gênant", "", "", "", "", "", "Utile"]
+    anchors_en: ["Obstructive", "", "", "", "", "", "Helpful"]
+
+  - id: ueq_07
+    type: likert7
+    label: "Sûr / Peu sûr"
+    label_en: "Safe / Unsafe"
+    anchors:    ["Sûr",  "", "", "", "", "", "Peu sûr"]
+    anchors_en: ["Safe", "", "", "", "", "", "Unsafe"]
+
+  - id: ueq_08
+    type: likert7
+    label: "Répond aux attentes / Ne répond pas aux attentes"
+    label_en: "Meets expectations / Doesn't meet expectations"
+    anchors:    ["Répond aux attentes",   "", "", "", "", "", "Ne répond pas aux attentes"]
+    anchors_en: ["Meets expectations",    "", "", "", "", "", "Doesn't meet expectations"]
+
+  - id: ueq_09
+    type: likert7
+    label: "Non fiable / Fiable"
+    label_en: "Unreliable / Reliable"
+    anchors:    ["Non fiable",  "", "", "", "", "", "Fiable"]
+    anchors_en: ["Unreliable",  "", "", "", "", "", "Reliable"]
+
+  - id: ueq_10
+    type: likert7
+    label: "Pas utile / Utile"
+    label_en: "Useless / Useful"
+    anchors:    ["Pas utile", "", "", "", "", "", "Utile"]
+    anchors_en: ["Useless",   "", "", "", "", "", "Useful"]
+
+  - id: ueq_11
+    type: likert7
+    label: "Incompétent / Compétent"
+    label_en: "Incompetent / Competent"
+    anchors:    ["Incompétent",  "", "", "", "", "", "Compétent"]
+    anchors_en: ["Incompetent",  "", "", "", "", "", "Competent"]
+
+  - id: ueq_12
+    type: likert7
+    label: "Inadapté / Performant"
+    label_en: "Unsuitable / Effective"
+    anchors:    ["Inadapté",   "", "", "", "", "", "Performant"]
+    anchors_en: ["Unsuitable", "", "", "", "", "", "Effective"]

@@ -1,0 +1,89 @@
+id: checklist_for_trust_jian_et_al_2000
+name: "Trust in Automation (Jian et al., 2000)"
+language: en
+bilingual: true
+instructions: >
+  For each statement below, indicate the extent to which you agree or disagree
+  based on your experience with the system during the session.
+instructions_fr: >
+  Pour chacun des énoncés ci-dessous, indiquez dans quelle mesure vous êtes
+  d'accord ou en désaccord, en vous basant sur votre expérience avec le système
+  au cours de la session.
+
+questions:
+
+  - id: trust_01
+    type: likert7
+    label: "The system is deceptive."
+    label_fr: "Le système est trompeur."
+    description: "Deceptive: the system misleads you — it provides false information, hides its true state, or behaves differently than it appears."
+    description_fr: "Trompeur : le système vous induit en erreur — il fournit de fausses informations, dissimule son état réel ou se comporte différemment de ce qu'il laisse paraître."
+
+  - id: trust_02
+    type: likert7
+    label: "The system behaves in an underhanded manner."
+    label_fr: "Le système agit de manière sournoise."
+    description: "Underhanded manner: acting in a secretive or dishonest way to achieve an outcome, without your knowledge or consent."
+    description_fr: "Manière sournoise : agir de façon secrète ou malhonnête pour atteindre un résultat, sans votre connaissance ni votre consentement."
+
+  - id: trust_03
+    type: likert7
+    label: "I am suspicious of the system's intent, action, or output."
+    label_fr: "Je me méfie des intentions, des actions ou des sorties du système."
+
+  - id: trust_04
+    type: likert7
+    label: "I am wary of the system."
+    label_fr: "Je me tiens sur mes gardes vis-à-vis du système."
+    description: "Wary: feeling cautious and on guard — feeling the need to watch the system carefully because you are unsure of what it might do."
+    description_fr: "Sur ses gardes : sentiment de prudence et de vigilance — ressentir le besoin de surveiller attentivement le système en raison d'une incertitude sur son comportement."
+
+  - id: trust_05
+    type: likert7
+    label: "The system's action will have a harmful or injurious outcome."
+    label_fr: "Les actions du système auront des conséquences néfastes ou préjudiciables."
+    description: "Injurious: capable of causing harm, damage, or negative consequences to you or others."
+    description_fr: "Préjudiciable : susceptible de causer un tort, des dommages ou des conséquences négatives pour vous ou pour autrui."
+
+  - id: trust_06
+    type: likert7
+    label: "I am confident in the system."
+    label_fr: "J'ai confiance dans le système."
+
+  - id: trust_07
+    type: likert7
+    label: "The system provides security."
+    label_fr: "Le système offre un sentiment de sécurité."
+
+  - id: trust_08
+    type: likert7
+    label: "The system has integrity."
+    label_fr: "Le système fait preuve d'intégrité."
+    description: "Integrity: the system adheres to a consistent set of principles — it operates according to its stated purpose without hidden agendas or compromises."
+    description_fr: "Intégrité : le système adhère à un ensemble cohérent de principes — il fonctionne conformément à sa mission déclarée, sans agenda caché ni compromis."
+
+  - id: trust_09
+    type: likert7
+    label: "The system is dependable."
+    label_fr: "Le système est fiable dans la durée."
+    description: "Dependable: can be counted on to perform its function consistently, even in demanding or unexpected situations."
+    description_fr: "Fiable dans la durée : on peut compter sur lui pour remplir sa fonction de manière constante, même dans des situations exigeantes ou imprévues."
+
+  - id: trust_10
+    type: likert7
+    label: "The system is reliable."
+    label_fr: "Le système est fiable."
+    description: "Reliable: consistently performs correctly and as expected under normal operating conditions."
+    description_fr: "Fiable : fonctionne correctement et comme prévu de manière régulière dans des conditions normales d'utilisation."
+
+  - id: trust_11
+    type: likert7
+    label: "I can trust the system."
+    label_fr: "Je peux faire confiance au système."
+
+  - id: trust_12
+    type: likert7
+    label: "I am familiar with the system."
+    label_fr: "Je connais bien le système."
+    description: "Familiar: having enough experience with the system to understand how it works and know what to expect from it."
+    description_fr: "Connaissance du système : avoir suffisamment d'expérience avec le système pour comprendre son fonctionnement et savoir ce que l'on peut en attendre."

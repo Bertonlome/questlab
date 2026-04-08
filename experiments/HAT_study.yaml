@@ -1,0 +1,48 @@
+# One file = one study, with all conditions defined below.
+# Each condition has its own ordered list of questionnaires.
+# Add or reorder entries freely — the condition dropdown on the start page
+# is populated automatically from the keys under `conditions:`.
+
+experiment_id: Human-Autonomy-Teaming
+name: "HAT Study"
+
+conditions:
+
+  after_briefing:
+    questionnaires:
+      - autonomous_systems_and_vocal_commands_familiarity
+      - current_operational_factors
+  after_familiarization:
+    questionnaires:
+      - nasa_tlx_subscale_ranking
+      - checklist_for_trust_jian_et_al_2000
+  baseline_no_system:
+    questionnaires:
+      - nasa_tlx_evaluation
+  TARS:
+    questionnaires:
+      - nasa_tlx_evaluation
+      - oversight_bespoke
+      - trust_risk_bespoke
+      - checklist_for_trust_jian_et_al_2000
+      - ueq_plus_customized
+  TARP-F:
+    questionnaires:
+      - nasa_tlx_evaluation
+      - oversight_bespoke
+      - trust_risk_bespoke
+      - checklist_for_trust_jian_et_al_2000
+      - ueq_plus_customized
+  TARP-S:
+    questionnaires:
+      - nasa_tlx_evaluation
+      - oversight_bespoke
+      - trust_risk_bespoke
+      - checklist_for_trust_jian_et_al_2000
+      - ueq_plus_customized
+  TARC:
+    questionnaires:
+      - nasa_tlx_evaluation
+  post_experiment:
+    questionnaires:
+      - trust_ranking_tars

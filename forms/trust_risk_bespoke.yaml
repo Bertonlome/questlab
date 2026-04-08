@@ -1,0 +1,37 @@
+id: trust_risk_bespoke
+name: "Confiance et Risque Perçu"
+name_en: "Trust and Perceived Risk"
+language: fr
+bilingual: true
+
+questions:
+
+  - id: trust_vas
+    type: vas
+    label: "En tenant compte de cette définition, comment évalueriez-vous votre niveau de confiance envers le système ?"
+    label_en: "Based on this definition, how would you rate your level of trust in the system?"
+    description: |
+      Confiance : Sentiment de quelqu'un qui se fie entièrement à quelqu'un d'autre, à quelque chose.
+      Par exemple : notre amitié est fondée sur une confiance réciproque.
+    description_en: |
+      Trust: A feeling of complete reliance on someone or something.
+      For example: our friendship is built on mutual trust.
+    min: 0
+    max: 100
+    min_label: "Pas du tout / Not at all"
+    max_label: "Complètement / Completely"
+
+  - id: risk_vas
+    type: vas
+    label: "En tenant compte de cette définition, comment évalueriez-vous le niveau de risque perçu lié à l'utilisation du système ?"
+    label_en: "Based on this definition, how would you rate the level of perceived risk associated with using the system?"
+    description: |
+      Risque perçu : Évaluation subjective de la probabilité qu'une action ou l'utilisation d'un système entraîne une conséquence négative ou un préjudice.
+      Par exemple : se fier à un système automatisé dans un contexte opérationnel critique implique un risque perçu lié à d'éventuelles erreurs ou défaillances du système.
+    description_en: |
+      Perceived risk: A subjective assessment of the likelihood that an action or the use of a system will lead to a negative consequence or harm.
+      For example: relying on an automated system in a critical operational context involves a perceived risk tied to possible system errors or failures.
+    min: 0
+    max: 100
+    min_label: "Pas du tout / Not at all"
+    max_label: "Complètement / Completely"

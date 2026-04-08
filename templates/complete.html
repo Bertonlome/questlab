@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if all_finished %}Study Complete{% else %}Condition Complete{% endif %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="complete-card">
+
+      {% if all_finished %}
+        <div class="complete-icon">&#10003;</div>
+        <h1>All done!</h1>
+        <p>
+          Thank you, <strong>{{ session.participant }}</strong>.<br>
+          All conditions for <em>{{ experiment.name }}</em> have been completed
+          and your responses are saved.
+        </p>
+        <p class="done-note">You may close this window.</p>
+
+      {% else %}
+        <div class="complete-icon cond-icon">&#10003;</div>
+        <h1>Condition complete</h1>
+        <p>
+          Good work, <strong>{{ session.participant }}</strong>.<br>
+          The responses for <em>{{ session.condition }}</em> have been saved.
+        </p>
+
+        <div class="cond-progress">
+          {% for c in all_conds %}
+            {% if c in done_conds %}
+              <div class="cond-row cond-done">
+                <span class="cond-status">&#10003;</span>
+                <span class="cond-name">{{ c }}</span>
+              </div>
+            {% else %}
+              <form method="POST" action="{{ url_for('next_condition', session_id=session.session_id) }}" style="margin:0">
+                <input type="hidden" name="condition" value="{{ c }}">
+                <button type="submit" class="cond-row cond-available {% if c == next_cond %}cond-suggested{% endif %}">
+                  <span class="cond-status">&#8594;</span>
+                  <span class="cond-name">{{ c }}</span>
+                  {% if c == next_cond %}<span class="cond-suggested-badge">suggested</span>{% endif %}
+                </button>
+              </form>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <p class="done-note">Do not close this window.</p>
+      {% endif %}
+
+    </div>
+  </div>
+</body>
+</html>
