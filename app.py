@@ -506,17 +506,18 @@ if __name__ == "__main__":
         lan_ip = "127.0.0.1"
 
     experiments = _list_experiments()
+    port = 5064
 
-    print("\n  ╔══════════════════════════════════════╗")
-    print("  ║        QuickWebForms running         ║")
-    print("  ╠══════════════════════════════════════╣")
-    print(f"  ║  Local:   http://127.0.0.1:5000      ║")
-    print(f"  ║  Network: http://{lan_ip}:5000")
-    print("  ╠══════════════════════════════════════╣")
+    print("\n  +--------------------------------------+")
+    print("  |        QuickWebForms running         |")
+    print("  +--------------------------------------+")
+    print(f"  |  Local:   http://127.0.0.1:{port}      |")
+    print(f"  |  Network: http://{lan_ip}:{port}")
+    print("  +--------------------------------------+")
     if experiments:
-        print("  ║  Export URLs:                        ║")
+        print("  |  Export URLs:                        |")
         for exp in experiments:
-            print(f"  ║  /export/{exp}")
-    print("  ╚══════════════════════════════════════╝\n")
+            print(f"  |  /export/{exp}")
+    print("  +--------------------------------------+\n")
 
-    app.run(host="0.0.0.0", port=5064, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=False)
