@@ -15,7 +15,7 @@ conditions:
   after_familiarization:
     questionnaires:
       - nasa_tlx_subscale_ranking
-      - checklist_for_trust_jian_et_al_2000
+      - trust_in_automation_scale_korber_et_al_2015
   baseline_no_system:
     questionnaires:
       - nasa_tlx_evaluation
@@ -25,7 +25,7 @@ conditions:
       - perceived_control
       - oversight_bespoke
       - trust_risk_bespoke
-      - checklist_for_trust_jian_et_al_2000
+      - trust_in_automation_scale_korber_et_al_2015
       - ueq_plus_customized
   TARP-F:
     questionnaires:
@@ -33,7 +33,7 @@ conditions:
       - perceived_control
       - oversight_bespoke
       - trust_risk_bespoke
-      - checklist_for_trust_jian_et_al_2000
+      - trust_in_automation_scale_korber_et_al_2015
       - ueq_plus_customized
   TARP-S:
     questionnaires:
@@ -41,11 +41,11 @@ conditions:
       - perceived_control
       - oversight_bespoke
       - trust_risk_bespoke
-      - checklist_for_trust_jian_et_al_2000
+      - trust_in_automation_scale_korber_et_al_2015
       - ueq_plus_customized
   TARC:
     questionnaires:
       - nasa_tlx_evaluation
-  post_experiment:
+  INTERVIEW:
     questionnaires:
-      - trust_ranking_tars
+      - TARS_hitls_itw_guide

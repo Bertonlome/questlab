@@ -160,15 +160,24 @@ _CSV_HEADERS = [
     "questionnaire_id", "question_id", "value", "saved_at",
 ]
 
-def _append_csv(experiment_id: str, rows):
-    """Append rows to data/<experiment_id>.csv, creating the file if needed."""
+def _sync_csv(experiment_id: str, db):
+    """Rewrite data/<experiment_id>.csv from the current DB state (no duplicates)."""
+    rows = db.execute(
+        """
+        SELECT s.participant, s.experiment_id, s.condition, s.started_at,
+               a.questionnaire_id, a.question_id, a.value, a.saved_at
+        FROM   answers a
+        JOIN   sessions s ON a.session_id = s.session_id
+        WHERE  s.experiment_id = ?
+        ORDER  BY s.participant, s.started_at, a.questionnaire_id, a.question_id
+        """,
+        (experiment_id,),
+    ).fetchall()
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     csv_path = DB_PATH.parent / f"{experiment_id}.csv"
-    write_header = not csv_path.exists()
-    with open(csv_path, "a", newline="", encoding="utf-8") as f:
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        if write_header:
-            w.writerow(_CSV_HEADERS)
+        w.writerow(_CSV_HEADERS)
         w.writerows(rows)
 
 
@@ -327,6 +336,14 @@ def autosave():
          value, datetime.now(TZ).isoformat()),
     )
     db.commit()
+
+    # Keep the CSV in sync so notes are persisted even if the form is never submitted
+    session_row = db.execute(
+        "SELECT experiment_id FROM sessions WHERE session_id=?", (session_id,)
+    ).fetchone()
+    if session_row:
+        _sync_csv(session_row["experiment_id"], db)
+
     return jsonify(ok=True)
 
 
@@ -348,6 +365,8 @@ def submit(session_id, q_index):
 
     # Final save from the form POST — belt-and-suspenders on top of autosave
     for q in form["questions"]:
+        if q.get("type") == "info":
+            continue
         qid = q["id"]
         if q["type"] == "multi_choice":
             value = json.dumps(request.form.getlist(qid))
@@ -374,19 +393,8 @@ def submit(session_id, q_index):
     )
     db.commit()
 
-    # Write completed questionnaire answers to the experiment CSV immediately
-    saved_rows = db.execute(
-        """
-        SELECT s.participant, s.experiment_id, s.condition, s.started_at,
-               a.questionnaire_id, a.question_id, a.value, a.saved_at
-        FROM   answers a
-        JOIN   sessions s ON a.session_id = s.session_id
-        WHERE  a.session_id = ? AND a.questionnaire_id = ?
-        ORDER  BY a.question_id
-        """,
-        (session_id, form_id),
-    ).fetchall()
-    _append_csv(session["experiment_id"], saved_rows)
+    # Sync the full experiment CSV so all answers (including notes) are always current
+    _sync_csv(session["experiment_id"], db)
 
     next_q = q_index + 1
     if next_q >= len(form_list):
@@ -458,6 +466,133 @@ def next_condition(session_id):
     )
     db.commit()
     return redirect(url_for("questionnaire", session_id=new_session_id, q_index=0))
+
+
+@app.route("/upload_audio/<session_id>/<questionnaire_id>/<question_id>", methods=["POST"])
+def upload_audio(session_id, questionnaire_id, question_id):
+    """Receive a recorded audio blob, save to data/, autosave filename as answer."""
+    db      = get_db()
+    session = db.execute(
+        "SELECT * FROM sessions WHERE session_id=?", (session_id,)
+    ).fetchone()
+    if not session:
+        return jsonify(ok=False, error="session not found"), 404
+
+    audio_file = request.files.get("audio")
+    if not audio_file:
+        return jsonify(ok=False, error="no audio file"), 400
+
+    now = datetime.now(TZ)
+    safe_participant = "".join(
+        c for c in session["participant"] if c.isalnum() or c in "-_"
+    )
+    safe_qid = "".join(c for c in question_id if c.isalnum() or c in "-_")
+
+    mime = (audio_file.mimetype or "").lower()
+    if "ogg" in mime:
+        ext = ".ogg"
+    elif "mp4" in mime or "m4a" in mime:
+        ext = ".m4a"
+    else:
+        ext = ".webm"
+
+    filename  = f"{safe_participant}_{now.strftime('%Y%m%d_%H%M%S')}_{safe_qid}{ext}"
+    save_path = DB_PATH.parent / filename
+    audio_file.save(str(save_path))
+
+    db.execute(
+        """
+        INSERT INTO answers (session_id, questionnaire_id, question_id, value, saved_at)
+        VALUES (?,?,?,?,?)
+        ON CONFLICT(session_id, questionnaire_id, question_id)
+        DO UPDATE SET value=excluded.value, saved_at=excluded.saved_at
+        """,
+        (session_id, questionnaire_id, question_id, filename, now.isoformat()),
+    )
+    db.commit()
+    return jsonify(ok=True, filename=filename)
+
+
+@app.route("/audio/<path:filename>")
+def serve_audio(filename):
+    """Stream a saved audio recording back to the browser for playback."""
+    # Prevent path traversal
+    if ".." in filename or filename.startswith("/"):
+        return "Not found", 404
+    audio_path = DB_PATH.parent / filename
+    if not audio_path.exists():
+        return "Not found", 404
+    return send_file(str(audio_path))
+
+
+@app.route("/prev_answers/<session_id>")
+def prev_answers(session_id):
+    """Return per-condition answers for requested question IDs for this participant."""
+    question_ids = request.args.getlist("q")
+    if not question_ids:
+        return jsonify(ok=False, error="no question ids"), 400
+
+    db      = get_db()
+    session = db.execute(
+        "SELECT * FROM sessions WHERE session_id=?", (session_id,)
+    ).fetchone()
+    if not session:
+        return jsonify(ok=False, error="session not found"), 404
+
+    participant   = session["participant"]
+    experiment_id = session["experiment_id"]
+
+    # All sessions for this participant in this experiment, ordered chronologically
+    sessions = db.execute(
+        "SELECT session_id, condition FROM sessions "
+        "WHERE participant=? AND experiment_id=? ORDER BY started_at",
+        (participant, experiment_id),
+    ).fetchall()
+
+    # Build question-metadata index by scanning all form files once
+    q_meta: dict = {}
+    for form_path in sorted(FORMS.glob("*.yaml")):
+        try:
+            with open(form_path, encoding="utf-8") as f:
+                form_data = yaml.safe_load(f)
+        except Exception:
+            continue
+        lang = form_data.get("language", "en")
+        for q in form_data.get("questions", []):
+            qid = q.get("id")
+            if qid and qid not in q_meta:
+                q_meta[qid] = {
+                    "label":    q.get("label", qid),
+                    "label_en": q.get("label_en", q.get("label", qid)),
+                    "type":     q.get("type", "free_text"),
+                    "language": lang,
+                }
+
+    results = []
+    for qid in question_ids:
+        meta = q_meta.get(qid, {
+            "label": qid, "label_en": qid, "type": "free_text", "language": "fr",
+        })
+        answers = []
+        for sess in sessions:
+            row = db.execute(
+                "SELECT value FROM answers WHERE session_id=? AND question_id=?",
+                (sess["session_id"], qid),
+            ).fetchone()
+            answers.append({
+                "condition": sess["condition"],
+                "value":     row["value"] if row else None,
+            })
+        results.append({
+            "question_id": qid,
+            "label":       meta["label"],
+            "label_en":    meta["label_en"],
+            "type":        meta["type"],
+            "language":    meta["language"],
+            "answers":     answers,
+        })
+
+    return jsonify(ok=True, results=results)
 
 
 @app.route("/export/<experiment_id>")

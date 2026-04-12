@@ -64,6 +64,18 @@
     <form method="POST" action="/submit/{{ session_id }}/{{ q_index }}">
 
       {% for q in form.questions %}
+
+      {# ── INFO BLOCK (section headers, instruction text) ──────────── #}
+      {% if q.type == 'info' %}
+      <div class="info-block{% if q.get('style') == 'section_header' %} section-header{% endif %}">
+        <span class="lang-primary">{{ q.label }}</span>
+        {% if form.bilingual and q.get('label_en') %}
+        <span class="lang-alt">{{ q.label_en }}</span>
+        {% endif %}
+      </div>
+
+      {% else %}
+      {# ── QUESTION CARD ───────────────────────────────────────────── #}
       <div class="question{% if q.id == attention_check_id %} attention-check-item{% endif %}"
            {% if q.id == attention_check_id %}data-attention-check-correct="{{ attention_check_correct }}"{% endif %}>
         <div class="question-label">
@@ -78,6 +90,38 @@
           {% if q.description %}<span class="lang-primary">{{ q.description }}</span>{% endif %}
           {% if form.bilingual and q.get('description' ~ _alt_sfx) %}<span class="lang-alt">{{ q.get('description' ~ _alt_sfx) }}</span>{% endif %}
         </div>
+        {% endif %}
+
+        {# ── PROBES / RELANCES ───────────────────────────────────── #}
+        {% if q.get('probes') %}
+        <div class="probes-list">
+          <div class="probes-label">
+            <span class="lang-primary">→ Relances</span>
+            <span class="lang-alt">→ Probes</span>
+          </div>
+          <ul>
+            {% set probes_alt = q.get('probes_en', []) %}
+            {% for i in range(q.probes | length) %}
+            <li>
+              <span class="lang-primary">{{ q.probes[i] }}</span>
+              {% if form.bilingual and i < probes_alt | length %}
+              <span class="lang-alt">{{ probes_alt[i] }}</span>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {# ── Show-previous-answers button ─────────────────────── #}
+        {% if q.get('show_answers_for') %}
+        <button type="button" class="show-prev-btn"
+                data-qids='{{ q.show_answers_for | tojson }}'
+                data-session="{{ session_id }}">
+          &#128202;
+          <span class="lang-primary">Afficher réponses précédentes</span>
+          <span class="lang-alt">Show previous answers</span>
+        </button>
         {% endif %}
 
         {# ── LIKERT 5 or 7 ─────────────────────────────────────── #}
@@ -179,8 +223,32 @@
                  placeholder="{{ q.get('placeholder', '') }}"
                  {% if q.get('required', true) != false %}required{% endif %}>
 
+        {# ── AUDIO RECORDER ──────────────────────────────────────── #}
+        {% elif q.type == 'audio_recorder' %}
+          <div class="audio-recorder-widget" data-question-id="{{ q.id }}">
+            <div class="audio-rec-controls">
+              <button type="button" class="audio-rec-btn audio-rec-start">&#9679;
+                <span class="lang-primary">Démarrer</span><span class="lang-alt">Record</span>
+              </button>
+              <button type="button" class="audio-rec-btn audio-rec-stop" disabled>&#9632;
+                <span class="lang-primary">Arrêter</span><span class="lang-alt">Stop</span>
+              </button>
+            </div>
+            <div class="audio-rec-status">
+              <span class="lang-primary">Prêt</span><span class="lang-alt">Ready</span>
+            </div>
+            <audio class="audio-rec-player" controls style="display:none; margin-top:12px; width:100%"></audio>
+            <div class="audio-rec-filename">
+              {% if existing.get(q.id) %}
+              <span class="lang-primary">Fichier : </span><span class="lang-alt">File: </span><code>{{ existing.get(q.id) }}</code>
+              {% endif %}
+            </div>
+            <input type="hidden" name="{{ q.id }}" value="{{ existing.get(q.id, '') }}">
+          </div>
+
         {% endif %}
       </div>
+      {% endif %}{# end if q.type != 'info' #}
       {% endfor %}
 
       <button type="submit" class="submit-btn">
@@ -193,9 +261,24 @@
   {# Floating save indicator #}
   <div class="save-indicator" id="saveIndicator"></div>
 
+  {# ── Previous-answers modal (participant-facing) ────────────────────── #}
+  <div id="prevAnswersOverlay" class="prev-modal-overlay" style="display:none" role="dialog" aria-modal="true">
+    <div class="prev-modal-panel">
+      <div class="prev-modal-header">
+        <span class="prev-modal-title">
+          <span class="lang-primary">Vos réponses au questionnaire</span>
+          <span class="lang-alt">Your questionnaire answers</span>
+        </span>
+        <button type="button" class="prev-modal-close" id="prevModalClose" aria-label="Close">&times;</button>
+      </div>
+      <div id="prevAnswersBody"></div>
+    </div>
+  </div>
+
   <script>
     const SESSION_ID       = {{ session_id | tojson }};
     const QUESTIONNAIRE_ID = {{ form_id | tojson }};
+    const LIKERT_ANCHORS   = {{ LIKERT_ANCHORS | tojson }};
 
     let debounceTimers = {};
     let indicatorTimer = null;
@@ -383,6 +466,191 @@
           saveAnswer(el.name, checked);
         });
       });
+
+      // ── Audio recorder widgets ────────────────────────────────────────────
+      document.querySelectorAll('.audio-recorder-widget').forEach(widget => {
+        const questionId     = widget.dataset.questionId;
+        const startBtn       = widget.querySelector('.audio-rec-start');
+        const stopBtn        = widget.querySelector('.audio-rec-stop');
+        const statusEl       = widget.querySelector('.audio-rec-status');
+        const playerEl       = widget.querySelector('.audio-rec-player');
+        const filenameEl     = widget.querySelector('.audio-rec-filename');
+        const hiddenInput    = widget.querySelector('input[type=hidden]');
+
+        let mediaRecorder = null;
+        let chunks        = [];
+
+        startBtn.addEventListener('click', async () => {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            chunks = [];
+
+            // Pick best supported MIME type
+            const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/ogg', '']
+              .find(t => t === '' || MediaRecorder.isTypeSupported(t));
+            mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+
+            mediaRecorder.onstop = async () => {
+              stream.getTracks().forEach(t => t.stop());
+              const blob     = new Blob(chunks, { type: mediaRecorder.mimeType });
+              const formData = new FormData();
+              formData.append('audio', blob, 'recording.webm');
+
+              statusEl.innerHTML = '<span class="lang-primary">Envoi…</span><span class="lang-alt">Uploading…</span>';
+
+              try {
+                const resp = await fetch(
+                  `/upload_audio/${SESSION_ID}/${QUESTIONNAIRE_ID}/${questionId}`,
+                  { method: 'POST', body: formData }
+                );
+                const data = await resp.json();
+                if (data.ok) {
+                  hiddenInput.value          = data.filename;
+                  filenameEl.innerHTML       = `<span class="lang-primary">Fichier\u00a0: </span><span class="lang-alt">File: </span><code>${data.filename}</code>`;
+                  playerEl.src               = `/audio/${data.filename}`;
+                  playerEl.style.display     = 'block';
+                  statusEl.innerHTML         = '<span class="lang-primary">\u2713 Enregistré</span><span class="lang-alt">\u2713 Saved</span>';
+                } else {
+                  statusEl.innerHTML = '<span class="lang-primary">\u26a0 Échec de l\'envoi</span><span class="lang-alt">\u26a0 Upload failed</span>';
+                }
+              } catch (err) {
+                statusEl.innerHTML = '<span class="lang-primary">\u26a0 Erreur réseau</span><span class="lang-alt">\u26a0 Network error</span>';
+              }
+              startBtn.disabled = false;
+              stopBtn.disabled  = true;
+            };
+
+            mediaRecorder.start();
+            startBtn.disabled = true;
+            stopBtn.disabled  = false;
+            statusEl.innerHTML = '<span class="lang-primary">\u25cf Enregistrement…</span><span class="lang-alt">\u25cf Recording…</span>';
+          } catch (err) {
+            statusEl.innerHTML = '<span class="lang-primary">\u26a0 Accès micro refusé</span><span class="lang-alt">\u26a0 Microphone access denied</span>';
+          }
+        });
+
+        stopBtn.addEventListener('click', () => {
+          if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            statusEl.innerHTML = '<span class="lang-primary">Traitement…</span><span class="lang-alt">Processing…</span>';
+          }
+        });
+      });
+
+      // ── Previous-answers modal ────────────────────────────────────────
+      const overlay     = document.getElementById('prevAnswersOverlay');
+      const modalClose  = document.getElementById('prevModalClose');
+      const answersBody = document.getElementById('prevAnswersBody');
+
+      if (overlay && modalClose && answersBody) {
+
+      function closePrevModal() {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+
+      modalClose.addEventListener('click', closePrevModal);
+      overlay.addEventListener('click', e => { if (e.target === overlay) closePrevModal(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closePrevModal(); });
+
+      document.querySelectorAll('.show-prev-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const qids    = JSON.parse(btn.dataset.qids);
+          const sessId  = btn.dataset.session;
+          const params  = qids.map(q => `q=${encodeURIComponent(q)}`).join('&');
+
+          answersBody.innerHTML = '<div class="prev-loading">Chargement… / Loading…</div>';
+          overlay.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+
+          try {
+            const resp = await fetch(`/prev_answers/${sessId}?${params}`);
+            const data = await resp.json();
+            if (data.ok) renderPrevAnswers(data.results);
+            else answersBody.innerHTML = `<p class="prev-error">${data.error}</p>`;
+          } catch (e) {
+            answersBody.innerHTML = '<p class="prev-error">Network error</p>';
+          }
+        });
+      });
+
+      function renderPrevAnswers(results) {
+        answersBody.innerHTML = '';
+        const isAlt = document.body.classList.contains('lang-alt-active');
+
+        for (const q of results) {
+          const block = document.createElement('div');
+          block.className = 'prev-q-block';
+
+          const labelDiv = document.createElement('div');
+          labelDiv.className = 'prev-q-label';
+          labelDiv.textContent = (isAlt && q.label_en) ? q.label_en : q.label;
+          block.appendChild(labelDiv);
+
+          for (const ans of q.answers) {
+            const condBlock = document.createElement('div');
+            condBlock.className = 'prev-cond-block';
+
+            const condName = document.createElement('div');
+            condName.className = 'prev-cond-name';
+            condName.textContent = ans.condition || '—';
+            condBlock.appendChild(condName);
+
+            if (ans.value === null || ans.value === undefined || ans.value === '') {
+              const na = document.createElement('div');
+              na.className = 'prev-no-answer';
+              na.textContent = isAlt ? 'Not answered' : 'Non répondu';
+              condBlock.appendChild(na);
+            } else if (q.type === 'likert5' || q.type === 'likert7') {
+              const points  = q.type === 'likert5' ? 5 : 7;
+              const lang    = q.language || 'fr';
+              const anchors = (LIKERT_ANCHORS[lang] || LIKERT_ANCHORS['fr'])[q.type] ||
+                              (LIKERT_ANCHORS[lang] || LIKERT_ANCHORS['fr'])['likert5'];
+
+              const scaleEl = document.createElement('div');
+              scaleEl.className = 'prev-likert';
+
+              for (let i = 1; i <= points; i++) {
+                const opt = document.createElement('div');
+                opt.className = 'prev-likert-opt' + (String(i) === ans.value ? ' selected' : '');
+
+                const circle = document.createElement('div');
+                circle.className = 'prev-likert-circle';
+                circle.textContent = i;
+
+                const lbl = document.createElement('div');
+                lbl.className = 'prev-likert-lbl';
+                lbl.textContent = anchors[i - 1] || '';
+
+                opt.appendChild(circle);
+                opt.appendChild(lbl);
+                scaleEl.appendChild(opt);
+              }
+              condBlock.appendChild(scaleEl);
+
+              const val = parseInt(ans.value, 10);
+              if (!isNaN(val)) {
+                const valLbl = document.createElement('div');
+                valLbl.className = 'prev-value-label';
+                valLbl.textContent = `${val} — ${anchors[val - 1] || ''}`;
+                condBlock.appendChild(valLbl);
+              }
+            } else {
+              const textEl = document.createElement('div');
+              textEl.className = 'prev-text-value';
+              textEl.textContent = ans.value;
+              condBlock.appendChild(textEl);
+            }
+
+            block.appendChild(condBlock);
+          }
+          answersBody.appendChild(block);
+        }
+      }
+
+      } // end if (overlay && modalClose && answersBody)
 
     });
   </script>

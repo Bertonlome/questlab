@@ -1,0 +1,234 @@
+id: TARS_hitls_itw_guide
+name: "Guide d'entretien – TARS HiTLS"
+name_en: "Interview Guide – TARS HiTLS"
+language: fr
+bilingual: true
+facilitator: true
+
+questions:
+
+  # ── Audio recorder ──────────────────────────────────────────────────── #
+
+  - id: audio_recording
+    type: audio_recorder
+    label: "Enregistrement de l'entretien"
+    label_en: "Interview Recording"
+    required: false
+
+  # ── Introduction ────────────────────────────────────────────────────── #
+
+  - id: intro_header
+    type: info
+    label: "Introduction"
+    label_en: "Introduction"
+    style: section_header
+
+  - id: intro_steps
+    type: info
+    label: |
+      - Remercier le participant pour sa participation.
+      - Expliquer que l'objectif est de comprendre son expérience d'interaction avec le système.
+      - Préciser qu'il n'y a pas de bonnes ou de mauvaises réponses.
+      - Encourager le participant à s'exprimer librement et à donner des exemples concrets.
+    label_en: |
+      - Thank the participant for their participation.
+      - Explain that the objective is to understand their experience interacting with the system.
+      - Clarify that there are no right or wrong answers.
+      - Encourage the participant to speak freely and give concrete examples.
+
+  # ── Section 1 ───────────────────────────────────────────────────────── #
+
+  - id: sec1_header
+    type: info
+    label: "1. Préférence globale et expérience"
+    label_en: "1. Overall Preference and Experience"
+    style: section_header
+
+  - id: q1_preference
+    type: free_text
+    label: "Quelle version avez-vous préférée (support, autonome sans délai, autonome avec délai), et pourquoi ?"
+    label_en: "Which version did you prefer (support, autonomous without delay, autonomous with delay), and why?"
+    probes:
+      - "Qu'est-ce qui a fait la différence pour vous ?"
+      - "Est-ce qu'une version vous a semblé plus fluide ?"
+    probes_en:
+      - "What made the difference for you?"
+      - "Did one version feel more fluid?"
+    placeholder: "Notes…"
+    rows: 4
+    required: false
+
+  # ── Section 2 ───────────────────────────────────────────────────────── #
+
+  - id: sec2_header
+    type: info
+    label: "2. Compréhension du système et observabilité"
+    label_en: "2. System Understanding and Observability"
+    style: section_header
+
+  - id: q2_comprend
+    type: free_text
+    label: "Quel système vous a aidé à mieux comprendre ce qu'il faisait ?"
+    label_en: "Which system helped you best understand what it was doing?"
+    show_answers_for: [ob_a1, ob_a2]
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  - id: q2_elements
+    type: free_text
+    label: "Quels éléments de l'interface vous ont aidé à mieux comprendre ce que faisait le système ? Pourquoi ?"
+    label_en: "What interface elements helped you better understand what the system was doing? Why?"
+    show_answers_for: [ob_a1, ob_a3]
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  - id: q2_execution
+    type: free_text
+    label: "Comment saviez-vous que l'action avait bien été exécutée par le système dans les différentes conditions ?"
+    label_en: "How did you know that the action had been successfully executed by the system in each condition?"
+    show_answers_for: [ob_a1, ob_b1]
+    probes:
+      - "Relancer pour chaque condition si nécessaire."
+      - "Où avez-vous regardé pour savoir que l'action a été exécutée ?"
+    probes_en:
+      - "Follow up for each condition if necessary."
+      - "Where did you look to know the action was executed?"
+    placeholder: "Notes…"
+    rows: 4
+    required: false
+
+  - id: q2_decalage
+    type: free_text
+    label: "Avez-vous ressenti un décalage entre ce que vous pensiez qui se passait et ce qui se passait réellement ?"
+    label_en: "Did you feel a gap between what you thought was happening and what was actually happening?"
+    show_answers_for: [ob_a3, ob_b3]
+    probes:
+      - "Avec quel système ?"
+      - "Pouvez-vous décrire un moment précis ?"
+    probes_en:
+      - "With which system?"
+      - "Can you describe a specific moment?"
+    placeholder: "Notes…"
+    rows: 4
+    required: false
+
+  - id: q2_info_manquante
+    type: free_text
+    label: "Vous manquait-il une information ?"
+    label_en: "Were you missing any information?"
+    show_answers_for: [ob_a2, ob_b2]
+    probes:
+      - "Avec quel système ?"
+      - "Quelle information aurait été utile ?"
+    probes_en:
+      - "With which system?"
+      - "What information would have been useful?"
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  # ── Section 3 ───────────────────────────────────────────────────────── #
+
+  - id: sec3_header
+    type: info
+    label: "3. Perception du système (perspective HAT)"
+    label_en: "3. System Perception (HAT Perspective)"
+    style: section_header
+
+  - id: q3_controle
+    type: free_text
+    label: "Dans quel système vous sentiez-vous le plus en contrôle ? Pourquoi ?"
+    label_en: "In which system did you feel most in control? Why?"
+    show_answers_for: [ob_c1, ob_c2]
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  - id: q3_supervision
+    type: free_text
+    label: "Dans quel système vous sentiez-vous le plus en supervision ? Pourquoi ?"
+    label_en: "In which system did you feel most in a supervisory role? Why?"
+    show_answers_for: [ob_a1, ob_a2, ob_b1]
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  - id: q3_changements
+    type: free_text
+    label: "Que changeriez-vous dans les systèmes ?"
+    label_en: "What would you change about the systems?"
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  - id: q3_outil_coequipier
+    type: free_text
+    label: "Avez-vous perçu le système davantage comme un outil ou comme un coéquipier ? Pourquoi ?"
+    label_en: "Did you perceive the system more as a tool or as a teammate? Why?"
+    show_answers_for: [ob_d1, ob_d2]
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  - id: q3_autonomie
+    type: free_text
+    label: "Dans quelle condition avez-vous trouvé que le système faisait preuve d'autonomie ? Pourquoi ou pourquoi pas ?"
+    label_en: "In which condition did you find the system showed autonomy? Why or why not?"
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  # ── Section 4 ───────────────────────────────────────────────────────── #
+
+  - id: sec4_header
+    type: info
+    label: "4. Confiance et gestion de l'erreur"
+    label_en: "4. Trust and Error Management"
+    style: section_header
+
+  - id: q4_verification
+    type: free_text
+    label: "Avez-vous ressenti le besoin de vérifier les actions du système ?"
+    label_en: "Did you feel the need to verify the system's actions?"
+    show_answers_for: [ob_b1, ob_b2, ob_b3]
+    probes:
+      - "Dans quelles situations ?"
+    probes_en:
+      - "In what situations?"
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  - id: q4_erreurs
+    type: free_text
+    label: "Est-ce que le système a fait des erreurs et si oui lesquelles ?"
+    label_en: "Did the system make any errors? If so, which ones?"
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  - id: q4_caract_erreur
+    type: free_text
+    label: "[Si erreur] Comment caractérisez-vous cette erreur : grave, peut-on rapidement la résoudre ?"
+    label_en: "[If error] How would you characterize this error: serious? Can it be quickly resolved?"
+    placeholder: "Notes…"
+    rows: 3
+    required: false
+
+  # ── Section 5 ───────────────────────────────────────────────────────── #
+
+  - id: sec5_header
+    type: info
+    label: "5. Questions de clôture"
+    label_en: "5. Closing Questions"
+    style: section_header
+
+  - id: q5_autre
+    type: free_text
+    label: "Y a-t-il autre chose que vous aimeriez ajouter concernant votre expérience ?"
+    label_en: "Is there anything else you would like to add about your experience?"
+    placeholder: "Notes…"
+    rows: 4
+    required: false

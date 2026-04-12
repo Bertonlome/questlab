@@ -561,3 +561,311 @@ input[type=number]:focus {
   .session-header { font-size: 12px; }
   .start-card, .complete-card { padding: 28px 20px; }
 }
+
+/* ── Info blocks (facilitator guide) ────────────────────────────────────── */
+
+.info-block {
+  background: #f0fdf4;
+  border-left: 3px solid #16a34a;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  color: #14532d;
+  white-space: pre-line;
+  line-height: 1.65;
+}
+
+.info-block.section-header {
+  background: #1e3a8a;
+  border-left: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 11px 18px;
+  margin-top: 10px;
+  margin-bottom: 16px;
+  white-space: normal;
+}
+
+/* ── Probes / Relances ──────────────────────────────────────────────────── */
+
+.probes-list {
+  background: #fefce8;
+  border: 1px dashed #fbbf24;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 13.5px;
+  color: #78350f;
+}
+
+.probes-label {
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: block;
+  color: #92400e;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.probes-list ul {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.7;
+}
+
+.probes-list li { margin-bottom: 2px; }
+
+/* ── Audio recorder widget ──────────────────────────────────────────────── */
+
+.audio-recorder-widget {
+  margin-top: 10px;
+}
+
+.audio-rec-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.audio-rec-btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.audio-rec-start {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+.audio-rec-start:hover:not(:disabled) { background: #b91c1c; border-color: #b91c1c; }
+
+.audio-rec-stop {
+  background: #fff;
+  color: #3f3f46;
+  border-color: #d4d4d8;
+}
+.audio-rec-stop:hover:not(:disabled) { border-color: #3f3f46; }
+
+.audio-rec-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.audio-rec-status {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #71717a;
+  font-style: italic;
+  min-height: 20px;
+}
+
+.audio-rec-filename {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #52525b;
+}
+.audio-rec-filename code {
+  background: #f4f4f5;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+/* ── Show-previous-answers button ───────────────────────────────────────── */
+
+.show-prev-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.show-prev-btn:hover { background: #dbeafe; border-color: #2563eb; }
+
+/* ── Previous-answers modal ─────────────────────────────────────────────── */
+
+.prev-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.93);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 24px 16px 40px;
+}
+
+.prev-modal-panel {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 28px 36px;
+  max-width: 700px;
+  width: 100%;
+  margin: auto;
+}
+
+.prev-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e4e4e7;
+}
+
+.prev-modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #18181b;
+}
+
+.prev-modal-close {
+  flex-shrink: 0;
+  background: #f4f4f5;
+  border: none;
+  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: #3f3f46;
+  transition: background 0.15s;
+}
+.prev-modal-close:hover { background: #e4e4e7; }
+
+.prev-loading { color: #a1a1aa; font-style: italic; font-size: 14px; }
+.prev-error   { color: #dc2626; font-size: 14px; }
+
+.prev-q-block {
+  margin-bottom: 28px;
+}
+
+.prev-q-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  background: #eff6ff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  line-height: 1.55;
+}
+
+.prev-cond-block {
+  background: #f9fafb;
+  border: 1px solid #e4e4e7;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.prev-cond-name {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #71717a;
+  margin-bottom: 10px;
+}
+
+/* Likert display inside modal */
+.prev-likert {
+  display: flex;
+  gap: 5px;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+
+.prev-likert-opt {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.prev-likert-circle {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid #d4d4d8;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: #a1a1aa;
+}
+
+.prev-likert-opt.selected .prev-likert-circle {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+  box-shadow: 0 0 0 5px #bfdbfe;
+}
+
+.prev-likert-lbl {
+  font-size: 9px;
+  text-align: center;
+  color: #71717a;
+  line-height: 1.3;
+  word-break: break-word;
+  hyphens: auto;
+  width: 100%;
+}
+
+.prev-likert-opt.selected .prev-likert-lbl {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.prev-value-label {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1d4ed8;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+.prev-no-answer {
+  color: #a1a1aa;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.prev-text-value {
+  font-size: 14px;
+  color: #18181b;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+@media (max-width: 520px) {
+  .prev-likert-circle { width: 36px; height: 36px; font-size: 14px; }
+  .prev-likert-lbl    { font-size: 8px; }
+}
