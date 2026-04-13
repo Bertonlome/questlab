@@ -50,10 +50,8 @@ questions:
     label_en: "Which version did you prefer (support, autonomous without delay, autonomous with delay), and why?"
     probes:
       - "Qu'est-ce qui a fait la différence pour vous ?"
-      - "Est-ce qu'une version vous a semblé plus fluide ?"
     probes_en:
       - "What made the difference for you?"
-      - "Did one version feel more fluid?"
     placeholder: "Notes…"
     rows: 4
     required: false
@@ -70,7 +68,7 @@ questions:
     type: free_text
     label: "Quel système vous a aidé à mieux comprendre ce qu'il faisait ?"
     label_en: "Which system helped you best understand what it was doing?"
-    show_answers_for: [ob_a1, ob_a2]
+    show_answers_for: [ob_a3, kta_02]
     placeholder: "Notes…"
     rows: 3
     required: false
@@ -79,7 +77,7 @@ questions:
     type: free_text
     label: "Quels éléments de l'interface vous ont aidé à mieux comprendre ce que faisait le système ? Pourquoi ?"
     label_en: "What interface elements helped you better understand what the system was doing? Why?"
-    show_answers_for: [ob_a1, ob_a3]
+    show_answers_for: [kta_07, kta_11]
     placeholder: "Notes…"
     rows: 3
     required: false
@@ -88,7 +86,7 @@ questions:
     type: free_text
     label: "Comment saviez-vous que l'action avait bien été exécutée par le système dans les différentes conditions ?"
     label_en: "How did you know that the action had been successfully executed by the system in each condition?"
-    show_answers_for: [ob_a1, ob_b1]
+    show_answers_for: [ob_a2, ob_b1, ob_c2, kta_11]
     probes:
       - "Relancer pour chaque condition si nécessaire."
       - "Où avez-vous regardé pour savoir que l'action a été exécutée ?"
@@ -103,7 +101,7 @@ questions:
     type: free_text
     label: "Avez-vous ressenti un décalage entre ce que vous pensiez qui se passait et ce qui se passait réellement ?"
     label_en: "Did you feel a gap between what you thought was happening and what was actually happening?"
-    show_answers_for: [ob_a3, ob_b3]
+    show_answers_for: [ob_a3, kta_11, kta_07, kta_02]
     probes:
       - "Avec quel système ?"
       - "Pouvez-vous décrire un moment précis ?"
@@ -118,7 +116,6 @@ questions:
     type: free_text
     label: "Vous manquait-il une information ?"
     label_en: "Were you missing any information?"
-    show_answers_for: [ob_a2, ob_b2]
     probes:
       - "Avec quel système ?"
       - "Quelle information aurait été utile ?"
@@ -141,16 +138,11 @@ questions:
     type: free_text
     label: "Dans quel système vous sentiez-vous le plus en contrôle ? Pourquoi ?"
     label_en: "In which system did you feel most in control? Why?"
-    show_answers_for: [ob_c1, ob_c2]
-    placeholder: "Notes…"
-    rows: 3
-    required: false
-
-  - id: q3_supervision
-    type: free_text
-    label: "Dans quel système vous sentiez-vous le plus en supervision ? Pourquoi ?"
-    label_en: "In which system did you feel most in a supervisory role? Why?"
-    show_answers_for: [ob_a1, ob_a2, ob_b1]
+    show_answers_for: [pc_01, pc_02, pc_03]
+    probes:
+      - "Dans quel système vous sentiez-vous le plus en supervision ? Pourquoi ?"
+    probes_en:
+      - "In which system did you feel most in a supervisory role? Why?"
     placeholder: "Notes…"
     rows: 3
     required: false
@@ -167,7 +159,7 @@ questions:
     type: free_text
     label: "Avez-vous perçu le système davantage comme un outil ou comme un coéquipier ? Pourquoi ?"
     label_en: "Did you perceive the system more as a tool or as a teammate? Why?"
-    show_answers_for: [ob_d1, ob_d2]
+    show_answers_for: [pc_04]
     placeholder: "Notes…"
     rows: 3
     required: false
@@ -205,6 +197,7 @@ questions:
     type: free_text
     label: "Est-ce que le système a fait des erreurs et si oui lesquelles ?"
     label_en: "Did the system make any errors? If so, which ones?"
+    show_answers_for: [kta_10, kta_06, ob_c1]
     placeholder: "Notes…"
     rows: 3
     required: false

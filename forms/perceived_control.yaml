@@ -22,4 +22,10 @@ questions:
     type: likert5
     label: "J'ai les ressources et la capacité pour faire usage de ce système autonome."
     label_en: "I have the resources and the ability to make use of this autonomous system."
+  - id: pc_04
+    type: likert5
+    label: "Dans quelle mesure estimez-vous que votre équipe a été efficace pour accomplir la mission ? (1 = pas du tout efficace, 5 = très efficace)"
+    label_en: "To what extent do you feel your team was effective in accomplishing the mission? (1 = not effective at all, 5 = very effective)"
+    anchors: ["Pas du tout efficace", "Peu efficace", "Neutre", "Assez efficace", "Très efficace"]
+    anchors_en: ["Not effective at all", "Slightly effective", "Neutral", "Quite effective", "Very effective"]
     

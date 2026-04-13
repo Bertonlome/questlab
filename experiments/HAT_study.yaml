@@ -10,12 +10,11 @@ conditions:
 
   after_briefing:
     questionnaires:
-      - autonomous_systems_and_vocal_commands_familiarity
+      - system_familiarity
       - current_operational_factors
   after_familiarization:
     questionnaires:
       - nasa_tlx_subscale_ranking
-      - trust_in_automation_scale_korber_et_al_2015
   baseline_no_system:
     questionnaires:
       - nasa_tlx_evaluation
@@ -26,7 +25,7 @@ conditions:
       - oversight_bespoke
       - trust_risk_bespoke
       - trust_in_automation_scale_korber_et_al_2015
-      - ueq_plus_customized
+      - sus
   TARP-F:
     questionnaires:
       - nasa_tlx_evaluation
@@ -34,7 +33,7 @@ conditions:
       - oversight_bespoke
       - trust_risk_bespoke
       - trust_in_automation_scale_korber_et_al_2015
-      - ueq_plus_customized
+      - sus
   TARP-S:
     questionnaires:
       - nasa_tlx_evaluation
@@ -42,7 +41,7 @@ conditions:
       - oversight_bespoke
       - trust_risk_bespoke
       - trust_in_automation_scale_korber_et_al_2015
-      - ueq_plus_customized
+      - sus
   TARC:
     questionnaires:
       - nasa_tlx_evaluation

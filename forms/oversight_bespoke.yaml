@@ -22,17 +22,10 @@ attention_check:
 
 questions:
 
-  - id: ob_a1
-    type: likert5
-    label: "J'ai été capable de suivre en permanence ce que faisait le système."
-    label_en: "I was able to keep track of what the system was doing at all times."
-    description: "A. Conscience de la situation et suivi"
-    description_en: "A. Awareness & Monitoring"
-
   - id: ob_a2
     type: likert5
     label: "J'avais suffisamment de temps et d'attention pour surveiller correctement le système."
-    label_en: "I had enough time and attention to monitor the system properly."
+    label_en: "I had enough time and attention to oversee the system properly."
 
   - id: ob_a3
     type: likert5

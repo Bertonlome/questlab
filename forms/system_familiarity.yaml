@@ -1,0 +1,12 @@
+id: autonomous_systems_and_vocal_commands_familiarity
+name: "Familiarité avec systèmes autonomes et à commandes vocales"
+name_en: "Familiarity with Autonomous Systems and Voice Commands"
+language: fr
+bilingual: true
+
+questions:
+
+  - id: used_similar
+    type: likert5
+    label: "J'ai déjà utilisé des systèmes similaires."
+    label_en: "I have already used similar systems."
