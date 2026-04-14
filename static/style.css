@@ -150,6 +150,20 @@ h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 2px; }
   font-weight: 600;
 }
 
+/* ── Conditional questions (show_if) ─────────────────────────────────────── */
+.question-conditional {
+  display: none;
+}
+.question-conditional.show-if-visible {
+  display: block;
+}
+
+/* ── Yes / No ────────────────────────────────────────────────────────────── */
+.yes-no-list {
+  display: flex;
+  gap: 16px;
+}
+
 /* ── Question card ──────────────────────────────────────────────────────── */
 
 .question {

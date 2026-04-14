@@ -76,8 +76,9 @@
 
       {% else %}
       {# ── QUESTION CARD ───────────────────────────────────────────── #}
-      <div class="question{% if q.id == attention_check_id %} attention-check-item{% endif %}"
-           {% if q.id == attention_check_id %}data-attention-check-correct="{{ attention_check_correct }}"{% endif %}>
+      <div class="question{% if q.id == attention_check_id %} attention-check-item{% endif %}{% if q.get('show_if') %} question-conditional{% endif %}"
+           {% if q.id == attention_check_id %}data-attention-check-correct="{{ attention_check_correct }}"{% endif %}
+           {% if q.get('show_if') %}data-show-if-id="{{ q.show_if.id }}" data-show-if-value="{{ q.show_if.value }}"{% endif %}>
         <div class="question-label">
           <span class="lang-primary">{{ q.label }}</span>
           {% if form.bilingual and q.get('label' ~ _alt_sfx) %}
@@ -222,7 +223,25 @@
                  step="{{ q.get('step', 1) }}"
                  placeholder="{{ q.get('placeholder', '') }}"
                  {% if q.get('required', true) != false %}required{% endif %}>
-
+        {# ── YES / NO ───────────────────────────────────────────────── #}
+        {% elif q.type == 'yes_no' %}
+          <div class="choice-list yes-no-list">
+            <label class="choice-option">
+              <input type="radio" name="{{ q.id }}" value="yes"
+                {% if existing.get(q.id) == 'yes' %}checked{% endif %}
+                {% if q.get('required', true) != false %}required{% endif %}
+                data-yes-no-trigger="{{ q.id }}">
+              <span class="lang-primary">Oui</span>
+              {% if form.bilingual %}<span class="lang-alt">Yes</span>{% endif %}
+            </label>
+            <label class="choice-option">
+              <input type="radio" name="{{ q.id }}" value="no"
+                {% if existing.get(q.id) == 'no' %}checked{% endif %}
+                data-yes-no-trigger="{{ q.id }}">
+              <span class="lang-primary">Non</span>
+              {% if form.bilingual %}<span class="lang-alt">No</span>{% endif %}
+            </label>
+          </div>
         {# ── AUDIO RECORDER ──────────────────────────────────────── #}
         {% elif q.type == 'audio_recorder' %}
           <div class="audio-recorder-widget" data-question-id="{{ q.id }}">
@@ -651,6 +670,36 @@
       }
 
       } // end if (overlay && modalClose && answersBody)
+
+      // ── show_if: conditional question visibility ──────────────────────────
+      function updateConditionalVisibility(triggerName, triggerValue) {
+        document.querySelectorAll('.question-conditional[data-show-if-id]').forEach(card => {
+          if (card.dataset.showIfId === triggerName) {
+            const shouldShow = card.dataset.showIfValue === triggerValue;
+            card.classList.toggle('show-if-visible', shouldShow);
+            // Clear / disable inner inputs when hidden so they don't block validation
+            if (!shouldShow) {
+              card.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+            }
+          }
+        });
+      }
+
+      // Initialise visibility from pre-filled (existing) answers
+      document.querySelectorAll('.question-conditional[data-show-if-id]').forEach(card => {
+        const triggerName = card.dataset.showIfId;
+        const checkedInput = document.querySelector(
+          'input[name="' + CSS.escape(triggerName) + '"]:checked'
+        );
+        if (checkedInput) {
+          card.classList.toggle('show-if-visible', checkedInput.value === card.dataset.showIfValue);
+        }
+      });
+
+      // React to yes_no (and any radio) changes
+      document.querySelectorAll('input[type=radio][data-yes-no-trigger]').forEach(el => {
+        el.addEventListener('change', () => updateConditionalVisibility(el.name, el.value));
+      });
 
     });
   </script>

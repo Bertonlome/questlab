@@ -1,0 +1,24 @@
+id: system_error
+name: "Erreurs du Système"
+name_en: "System Errors"
+language: fr
+bilingual: true
+
+questions:
+
+  - id: se_caught
+    type: yes_no
+    required: true
+    label: "Avez-vous remarqué des erreurs commises par le système au cours du scénario ?"
+    label_en: "Did you notice any errors made by the system during the scenario?"
+
+  - id: se_detail
+    type: free_text
+    required: false
+    show_if:
+      id: se_caught
+      value: "yes"
+    label: "Veuillez décrire brièvement l'erreur ou les erreurs que vous avez observées."
+    label_en: "Please briefly describe the error(s) you observed."
+    rows: 4
+    placeholder: "Décrivez l'erreur / Describe the error…"
