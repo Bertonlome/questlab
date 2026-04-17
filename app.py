@@ -59,6 +59,19 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 app.jinja_env.globals["LIKERT_ANCHORS"] = LIKERT_ANCHORS
 
+# ── Network info (computed once at import time) ───────────────────────────────
+APP_PORT = 5064
+try:
+    _s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    _s.connect(("8.8.8.8", 80))
+    APP_LAN_IP = _s.getsockname()[0]
+    _s.close()
+except Exception:
+    APP_LAN_IP = "127.0.0.1"
+
+app.jinja_env.globals["APP_LAN_IP"] = APP_LAN_IP
+app.jinja_env.globals["APP_PORT"] = APP_PORT
+
 DB_PATH      = Path("data/responses.db")
 EXPERIMENTS  = Path("experiments")
 FORMS        = Path("forms")
@@ -290,14 +303,24 @@ def questionnaire(session_id, q_index):
         ).fetchall()
     }
 
+    # Load names for the timeline tooltip/labels (only the 'name' field needed)
+    form_names = []
+    for fid in form_list:
+        try:
+            form_names.append(_load_form(fid).get("name", fid))
+        except Exception:
+            form_names.append(fid)
+
     return render_template(
         "form.html",
         session_id=session_id,
         q_index=q_index,
         total=len(form_list),
         experiment=experiment,
+        experiment_id=session["experiment_id"],
         form=form,
         form_id=form_id,
+        form_names=form_names,
         existing=existing,
         participant=session["participant"],
         attention_check_id=attention_check_id,
@@ -595,6 +618,82 @@ def prev_answers(session_id):
     return jsonify(ok=True, results=results)
 
 
+@app.route("/admin/participants/<experiment_id>")
+def admin_participants(experiment_id):
+    """Return all distinct participant codes recorded for an experiment (facilitator use)."""
+    db = get_db()
+    rows = db.execute(
+        "SELECT DISTINCT participant FROM sessions WHERE experiment_id=? ORDER BY participant",
+        (experiment_id,),
+    ).fetchall()
+    return jsonify(ok=True, participants=[r["participant"] for r in rows])
+
+
+@app.route("/admin/answers/<experiment_id>")
+def admin_answers(experiment_id):
+    """Return per-condition answers for selected participants and question IDs (facilitator use)."""
+    participants = request.args.getlist("participant")
+    question_ids = request.args.getlist("q")
+    if not participants or not question_ids:
+        return jsonify(ok=False, error="missing params"), 400
+
+    db = get_db()
+
+    # Build question-metadata index by scanning all form files
+    q_meta: dict = {}
+    for form_path in sorted(FORMS.glob("*.yaml")):
+        try:
+            with open(form_path, encoding="utf-8") as f:
+                form_data = yaml.safe_load(f)
+        except Exception:
+            continue
+        lang = form_data.get("language", "en")
+        for q in form_data.get("questions", []):
+            qid = q.get("id")
+            if qid and qid not in q_meta:
+                q_meta[qid] = {
+                    "label":    q.get("label", qid),
+                    "label_en": q.get("label_en", q.get("label", qid)),
+                    "type":     q.get("type", "free_text"),
+                    "language": lang,
+                }
+
+    multi   = len(participants) > 1
+    results = []
+    for qid in question_ids:
+        meta = q_meta.get(qid, {
+            "label": qid, "label_en": qid, "type": "free_text", "language": "fr",
+        })
+        answers = []
+        for participant in participants:
+            sessions = db.execute(
+                "SELECT session_id, condition FROM sessions "
+                "WHERE participant=? AND experiment_id=? ORDER BY started_at",
+                (participant, experiment_id),
+            ).fetchall()
+            for sess in sessions:
+                row = db.execute(
+                    "SELECT value FROM answers WHERE session_id=? AND question_id=?",
+                    (sess["session_id"], qid),
+                ).fetchone()
+                cond_label = f"{participant} / {sess['condition']}" if multi else sess["condition"]
+                answers.append({
+                    "condition":   cond_label,
+                    "participant": participant,
+                    "value":       row["value"] if row else None,
+                })
+        results.append({
+            "question_id": qid,
+            "label":       meta["label"],
+            "label_en":    meta["label_en"],
+            "type":        meta["type"],
+            "language":    meta["language"],
+            "answers":     answers,
+        })
+
+    return jsonify(ok=True, results=results)
+
+
 @app.route("/export/<experiment_id>")
 def export(experiment_id):
     """Download a flat CSV of all responses for this experiment."""
@@ -632,22 +731,13 @@ def export(experiment_id):
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        lan_ip = s.getsockname()[0]
-        s.close()
-    except Exception:
-        lan_ip = "127.0.0.1"
-
     experiments = _list_experiments()
-    port = 5064
 
     print("\n  +--------------------------------------+")
     print("  |        QuickWebForms running         |")
     print("  +--------------------------------------+")
-    print(f"  |  Local:   http://127.0.0.1:{port}      |")
-    print(f"  |  Network: http://{lan_ip}:{port}")
+    print(f"  |  Local:   http://127.0.0.1:{APP_PORT}      |")
+    print(f"  |  Network: http://{APP_LAN_IP}:{APP_PORT}")
     print("  +--------------------------------------+")
     if experiments:
         print("  |  Export URLs:                        |")
@@ -655,4 +745,4 @@ if __name__ == "__main__":
             print(f"  |  /export/{exp}")
     print("  +--------------------------------------+\n")
 
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=APP_PORT, debug=False)

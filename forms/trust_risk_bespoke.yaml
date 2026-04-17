@@ -33,5 +33,5 @@ questions:
       For example: relying on an automated system in a critical operational context involves a perceived risk tied to possible system errors or failures.
     min: 0
     max: 100
-    min_label: "Pas du tout / Not at all"
-    max_label: "Complètement / Completely"
+    min_label: "No risk at all / Aucun risque"
+    max_label: "Extremely high risk / Risque extrêmement élevé"

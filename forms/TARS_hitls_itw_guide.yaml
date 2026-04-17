@@ -66,8 +66,8 @@ questions:
 
   - id: q2_comprend
     type: free_text
-    label: "Quel système vous a aidé à mieux comprendre ce qu'il faisait ?"
-    label_en: "Which system helped you best understand what it was doing?"
+    label: "Quel système était selon vous le plus facile à comprendre ? Pourquoi ?"
+    label_en: "Which system was the easiest to understand, in your opinion? Why?"
     show_answers_for: [ob_a3, kta_02]
     placeholder: "Notes…"
     rows: 3
@@ -198,6 +198,14 @@ questions:
     label: "Est-ce que le système a fait des erreurs et si oui lesquelles ?"
     label_en: "Did the system make any errors? If so, which ones?"
     show_answers_for: [kta_10, kta_06, ob_c1]
+    probes:
+      - "ERREUR 1 Winds : Le système a donné une mauvaise estimation des vents à cause d'une erreur de l'aéroport de départ sur le METAR (CYHU au lieu de CYUL)."
+      - "ERREUR 2 Altitude : Le système a entrer une mauvaise commande de préselection de l'altitude sur l'autopilote en mode performer à cause d'une erreur de compréhension vocale de l'autorisation de décollage délivrée par l'ATC. En mode supporter il a donné une mauvaise suggestion d'altitude à cause de la même erreur de compréhension vocale."
+      - "ERREUR 3 Flaps : Le système n'a pas sorti les volets en mode performer et a indiqué que les volets étaient sortis alors qu'ils étaient rentrés en mode supporter."
+    probes_en:
+      - "ERROR 1 Winds: The system gave a wrong estimation of the winds due to an error in the departure airport on the METAR (CYHU instead of CYUL)."
+      - "ERROR 2 Altitude: The system entered a wrong altitude preselection command on the autopilot in performer mode due to a speech recognition error of the takeoff clearance given by ATC. In supporter mode it gave a wrong altitude suggestion due to the same speech recognition error."
+      - "ERROR 3 Flaps: The system did not extend the flaps in performer mode and indicated that the flaps were extended when they were retracted in supporter mode."
     placeholder: "Notes…"
     rows: 3
     required: false
@@ -211,14 +219,34 @@ questions:
     required: false
 
   # ── Section 5 ───────────────────────────────────────────────────────── #
-
   - id: sec5_header
     type: info
-    label: "5. Questions de clôture"
-    label_en: "5. Closing Questions"
+    label: "5. Allocation de tâche pour la condition personnalisée"
+    label_en: "5. Task Allocation for the Custom Condition"
     style: section_header
 
   - id: q5_autre
+    type: free_text
+    label: "Pourquoi avez-vous choisi d'allouer les tâches de cette manière ?"
+    label_en: "Why did you choose to allocate the tasks in this way?"
+    probes:
+      - "Qu'avez-vous choisi de déléguer au système ? Qu'avez-vous choisi pour recevoir du support ? Qu'avez-vous choisi de faire vous-même ?"
+    probes_en:
+      - "What did you choose to delegate to the system? What did you choose to receive support for? What did you choose to do yourself?"
+    placeholder: "Notes…"
+    rows: 4
+    required: false
+
+  # ── Section 6 ───────────────────────────────────────────────────────── #
+
+
+  - id: sec6_header
+    type: info
+    label: "6. Questions finales"
+    label_en: "6. Final Questions"
+    style: section_header
+
+  - id: q6_autre
     type: free_text
     label: "Y a-t-il autre chose que vous aimeriez ajouter concernant votre expérience ?"
     label_en: "Is there anything else you would like to add about your experience?"

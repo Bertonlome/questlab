@@ -16,21 +16,22 @@
 
     <div class="steps">
       {% for i in range(total) %}
+        {% set step_name = form_names[i] if form_names is defined and i < form_names|length else (i + 1)|string %}
         {% if i < q_index %}
-        <div class="step step-done" title="Questionnaire {{ i + 1 }} complete">
+        <a class="step step-done step-link" href="{{ url_for('questionnaire', session_id=session_id, q_index=i) }}" title="{{ step_name }}">
           <div class="step-circle">&#10003;</div>
           <div class="step-label">{{ i + 1 }}</div>
-        </div>
+        </a>
         {% elif i == q_index %}
-        <div class="step step-current" title="Questionnaire {{ i + 1 }} (current)">
+        <a class="step step-current step-link" href="{{ url_for('questionnaire', session_id=session_id, q_index=i) }}" title="{{ step_name }} (current)">
           <div class="step-circle">{{ i + 1 }}</div>
           <div class="step-label">{{ i + 1 }}</div>
-        </div>
+        </a>
         {% else %}
-        <div class="step step-todo" title="Questionnaire {{ i + 1 }} upcoming">
+        <a class="step step-todo step-link" href="{{ url_for('questionnaire', session_id=session_id, q_index=i) }}" title="{{ step_name }}">
           <div class="step-circle">{{ i + 1 }}</div>
           <div class="step-label">{{ i + 1 }}</div>
-        </div>
+        </a>
         {% endif %}
         {% if not loop.last %}<div class="step-line{% if i < q_index %} step-line-done{% endif %}"></div>{% endif %}
       {% endfor %}
@@ -58,6 +59,25 @@
       {% if form.bilingual and form.get('instructions' ~ _alt_sfx) %}
       <span class="lang-alt">{{ form.get('instructions' ~ _alt_sfx) }}</span>
       {% endif %}
+    </div>
+    {% endif %}
+
+    {% if form.get('facilitator') %}
+    <div class="admin-participant-picker" id="adminParticipantPicker">
+      <div class="admin-picker-header">
+        <span>
+          <span class="lang-primary">&#128101; Participant(s) à afficher dans les réponses</span>
+          <span class="lang-alt">&#128101; Participant(s) to display in answers</span>
+        </span>
+        <button type="button" class="admin-picker-toggle" id="adminPickerToggle"
+                aria-expanded="true" aria-controls="adminPickerBody">&#9660;</button>
+      </div>
+      <div class="admin-picker-body" id="adminPickerBody">
+        <div class="admin-picker-list" id="adminParticipantList">
+          <span class="admin-picker-loading">…</span>
+        </div>
+        <div class="admin-picker-tags" id="adminPickerTags"></div>
+      </div>
     </div>
     {% endif %}
 
@@ -298,6 +318,8 @@
     const SESSION_ID       = {{ session_id | tojson }};
     const QUESTIONNAIRE_ID = {{ form_id | tojson }};
     const LIKERT_ANCHORS   = {{ LIKERT_ANCHORS | tojson }};
+    const IS_FACILITATOR   = {{ (form.get('facilitator') or false) | tojson }};
+    const EXPERIMENT_ID    = {{ experiment_id | tojson }};
 
     let debounceTimers = {};
     let indicatorTimer = null;
@@ -558,6 +580,9 @@
         });
       });
 
+      // ── Admin participant picker state ────────────────────────────────────
+      const adminSelectedParticipants = new Set();
+
       // ── Previous-answers modal ────────────────────────────────────────
       const overlay     = document.getElementById('prevAnswersOverlay');
       const modalClose  = document.getElementById('prevModalClose');
@@ -576,16 +601,25 @@
 
       document.querySelectorAll('.show-prev-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
-          const qids    = JSON.parse(btn.dataset.qids);
-          const sessId  = btn.dataset.session;
-          const params  = qids.map(q => `q=${encodeURIComponent(q)}`).join('&');
+          const qids = JSON.parse(btn.dataset.qids);
 
           answersBody.innerHTML = '<div class="prev-loading">Chargement… / Loading…</div>';
           overlay.style.display = 'flex';
           document.body.style.overflow = 'hidden';
 
           try {
-            const resp = await fetch(`/prev_answers/${sessId}?${params}`);
+            let url;
+            if (IS_FACILITATOR && adminSelectedParticipants.size > 0) {
+              const pParams = Array.from(adminSelectedParticipants)
+                .map(p => `participant=${encodeURIComponent(p)}`).join('&');
+              const qParams = qids.map(q => `q=${encodeURIComponent(q)}`).join('&');
+              url = `/admin/answers/${EXPERIMENT_ID}?${pParams}&${qParams}`;
+            } else {
+              const sessId  = btn.dataset.session;
+              const qParams = qids.map(q => `q=${encodeURIComponent(q)}`).join('&');
+              url = `/prev_answers/${sessId}?${qParams}`;
+            }
+            const resp = await fetch(url);
             const data = await resp.json();
             if (data.ok) renderPrevAnswers(data.results);
             else answersBody.innerHTML = `<p class="prev-error">${data.error}</p>`;
@@ -671,6 +705,71 @@
 
       } // end if (overlay && modalClose && answersBody)
 
+      // ── Admin participant picker initialization ─────────────────────────────
+      if (IS_FACILITATOR) {
+        adminSelectedParticipants.add({{ participant | tojson }});
+
+        const pickerToggle = document.getElementById('adminPickerToggle');
+        const pickerBody   = document.getElementById('adminPickerBody');
+        if (pickerToggle && pickerBody) {
+          pickerToggle.addEventListener('click', () => {
+            const expanded = pickerToggle.getAttribute('aria-expanded') === 'true';
+            pickerToggle.setAttribute('aria-expanded', String(!expanded));
+            pickerToggle.textContent = expanded ? '\u25B6' : '\u25BC';
+            pickerBody.style.display = expanded ? 'none' : '';
+          });
+        }
+
+        function updateAdminTags() {
+          const tagsEl = document.getElementById('adminPickerTags');
+          if (!tagsEl) return;
+          tagsEl.innerHTML = '';
+          if (adminSelectedParticipants.size === 0) {
+            tagsEl.innerHTML = '<span class="admin-picker-none">Aucun s\u00e9lectionn\u00e9 / None selected</span>';
+            return;
+          }
+          adminSelectedParticipants.forEach(p => {
+            const tag = document.createElement('span');
+            tag.className = 'admin-tag';
+            tag.textContent = p;
+            tagsEl.appendChild(tag);
+          });
+        }
+
+        fetch(`/admin/participants/${EXPERIMENT_ID}`)
+          .then(r => r.json())
+          .then(data => {
+            const listEl = document.getElementById('adminParticipantList');
+            if (!listEl || !data.ok) return;
+            listEl.innerHTML = '';
+            if (data.participants.length === 0) {
+              listEl.innerHTML = '<span class="admin-picker-loading">Aucun participant / No participants found</span>';
+              return;
+            }
+            data.participants.forEach(p => {
+              const lbl = document.createElement('label');
+              lbl.className = 'admin-picker-item';
+              const cb = document.createElement('input');
+              cb.type    = 'checkbox';
+              cb.value   = p;
+              cb.checked = adminSelectedParticipants.has(p);
+              cb.addEventListener('change', () => {
+                if (cb.checked) adminSelectedParticipants.add(p);
+                else adminSelectedParticipants.delete(p);
+                updateAdminTags();
+              });
+              lbl.appendChild(cb);
+              lbl.append('\u00a0' + p);
+              listEl.appendChild(lbl);
+            });
+            updateAdminTags();
+          })
+          .catch(() => {
+            const listEl = document.getElementById('adminParticipantList');
+            if (listEl) listEl.textContent = 'Error loading participants';
+          });
+      }
+
       // ── show_if: conditional question visibility ──────────────────────────
       function updateConditionalVisibility(triggerName, triggerValue) {
         document.querySelectorAll('.question-conditional[data-show-if-id]').forEach(card => {
@@ -703,5 +802,8 @@
 
     });
   </script>
+  <footer class="ip-footer">
+    Connect from another device: <strong>http://{{ APP_LAN_IP }}:{{ APP_PORT }}</strong>
+  </footer>
 </body>
 </html>

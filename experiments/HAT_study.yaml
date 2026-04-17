@@ -15,14 +15,12 @@ conditions:
   after_familiarization:
     questionnaires:
       - nasa_tlx_subscale_ranking
-      - system_error
   baseline_no_system:
     questionnaires:
       - nasa_tlx_evaluation
   TARS:
     questionnaires:
       - nasa_tlx_evaluation
-      - system_error
       - perceived_control
       - oversight_bespoke
       - trust_risk_bespoke
@@ -31,7 +29,6 @@ conditions:
   TARP-F:
     questionnaires:
       - nasa_tlx_evaluation
-      - system_error
       - perceived_control
       - oversight_bespoke
       - trust_risk_bespoke
@@ -40,7 +37,6 @@ conditions:
   TARP-S:
     questionnaires:
       - nasa_tlx_evaluation
-      - system_error
       - perceived_control
       - oversight_bespoke
       - trust_risk_bespoke
@@ -49,7 +45,6 @@ conditions:
   TARC:
     questionnaires:
       - nasa_tlx_evaluation
-      - perceived control
       - oversight_bespoke
       - trust_risk_bespoke
       - trust_in_automation_scale_korber_et_al_2015

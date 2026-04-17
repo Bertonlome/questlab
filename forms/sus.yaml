@@ -46,6 +46,8 @@ questions:
   - id: sus_8
     type: likert5
     label: "I found the system very cumbersome to use."
+    description: "Cumbersome = difficult to use; uncomfortable; not practical; awkward."
+    description_fr: "Cumbersome = difficile à utiliser; inconfortable; pas pratique; maladroit."
     #anchors: ["Strongly Disagree", "Strongly Agree"]
 
   - id: sus_9
