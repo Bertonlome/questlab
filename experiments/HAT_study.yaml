@@ -45,6 +45,7 @@ conditions:
   TARC:
     questionnaires:
       - nasa_tlx_evaluation
+      - perceived_control
       - oversight_bespoke
       - trust_risk_bespoke
       - trust_in_automation_scale_korber_et_al_2015

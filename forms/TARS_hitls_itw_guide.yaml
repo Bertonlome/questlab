@@ -56,6 +56,18 @@ questions:
     rows: 4
     required: false
 
+    - id: q1_stratégie_allocation
+    type: free_text
+    label: "Avez-vous adopté une stratégie d'allocation des tâches ? Si oui, laquelle ?"
+    label_en: "Did you adopt a task allocation strategy? If so, which one?"
+    probes:
+      - "Par exemple, avez-vous choisi de faire certaines tâches vous-même et d'en déléguer d'autres au système ?"
+    probes_en:
+      - "For example, did you choose to do certain tasks yourself and delegate others to the system?"
+    placeholder: "Notes…"
+    rows: 4
+    required: false
+
   # ── Section 2 ───────────────────────────────────────────────────────── #
 
   - id: sec2_header
