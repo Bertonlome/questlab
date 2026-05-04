@@ -56,6 +56,18 @@ questions:
     rows: 4
     required: false
 
+  - id: q2_preference
+    type: free_text
+    label: "Quelle version avez-vous le moins préférée (support, autonome sans délai, autonome avec délai), et pourquoi ?"
+    label_en: "Which version did you prefer the least (support, autonomous without delay, autonomous with delay), and why?"
+    probes:
+      - "Qu'est-ce qui a fait la différence pour vous ?"
+    probes_en:
+      - "What made the difference for you?"
+    placeholder: "Notes…"
+    rows: 4
+    required: false
+
     - id: q1_stratégie_allocation
     type: free_text
     label: "Avez-vous adopté une stratégie d'allocation des tâches ? Si oui, laquelle ?"

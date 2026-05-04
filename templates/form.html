@@ -447,25 +447,7 @@
           return;
         }
 
-        // Attention check — warn if answered incorrectly, but don't block submission
-        const acCard = document.querySelector('.attention-check-item[data-attention-check-correct]');
-        if (acCard) {
-          const correctVal = acCard.dataset.attentionCheckCorrect;
-          const acInput    = acCard.querySelector('input[type=radio]');
-          if (acInput) {
-            const selected = document.querySelector(
-              'input[name="' + CSS.escape(acInput.name) + '"]:checked'
-            );
-            if (!selected || selected.value !== correctVal) {
-              e.preventDefault();
-              alert(
-                'Attention check: please make sure to read each statement carefully ' +
-                'and answer accurately before continuing.'
-              );
-              acCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          }
-        }
+        // Attention check — non-blocking; pass/fail is recorded server-side in the CSV
       });
 
       function _addErrorMsg(card) {

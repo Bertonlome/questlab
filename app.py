@@ -405,6 +405,23 @@ def submit(session_id, q_index):
             (session_id, form_id, qid, value, now),
         )
 
+    # Attention check: save a _passed flag (true/false) for easy data quality filtering
+    if form.get("attention_check"):
+        ac_cfg     = form["attention_check"]
+        ac_id      = ac_cfg.get("id", "_attention_check")
+        correct    = str(ac_cfg.get("correct_value", "5"))
+        submitted  = request.form.get(ac_id, "")
+        passed_val = "true" if submitted == correct else "false"
+        db.execute(
+            """
+            INSERT INTO answers (session_id, questionnaire_id, question_id, value, saved_at)
+            VALUES (?,?,?,?,?)
+            ON CONFLICT(session_id, questionnaire_id, question_id)
+            DO UPDATE SET value=excluded.value, saved_at=excluded.saved_at
+            """,
+            (session_id, form_id, f"{ac_id}_passed", passed_val, now),
+        )
+
     db.execute(
         "INSERT INTO completions (session_id, questionnaire_id, q_index, completed_at) "
         "VALUES (?,?,?,?)",
