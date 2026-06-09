@@ -1,0 +1,16 @@
+id: trust_in_decision_making
+name: "Confiance dans la Prise de Décision"
+name_en: "Trust in Decision Making"
+language: fr
+bilingual: true
+
+questions:
+
+  - id: trust_vas
+    type: vas
+    label: "Comment évalueriez-vous votre niveau de confiance dans votre décision ?"
+    label_en: "How would you rate your level of trust in your decision?"
+    min: 0
+    max: 100
+    min_label: "Pas du tout / Not at all"
+    max_label: "Complètement / Completely"

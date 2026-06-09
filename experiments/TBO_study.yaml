@@ -1,0 +1,33 @@
+# One file = one study, with all conditions defined below.
+# Each condition has its own ordered list of questionnaires.
+# Add or reorder entries freely — the condition dropdown on the start page
+# is populated automatically from the keys under `conditions:`.
+
+experiment_id: Trajectory-Based-Operations
+name: "TBO Study"
+
+conditions:
+  Baseline_low_complexity:
+    questionnaires:
+      - nasa_tlx_evaluation
+      - sart
+      - sus
+      - trust_in_decision_making
+  Baseline_high_complexity:
+    questionnaires:
+      - nasa_tlx_evaluation
+      - sart
+      - sus
+      - trust_in_decision_making
+  TBO_app_low_complexity:
+    questionnaires:
+      - nasa_tlx_evaluation
+      - sart
+      - sus
+      - trust_in_decision_making
+  TBO_app_high_complexity:
+    questionnaires:
+      - nasa_tlx_evaluation
+      - sart
+      - sus
+      - trust_in_decision_making
