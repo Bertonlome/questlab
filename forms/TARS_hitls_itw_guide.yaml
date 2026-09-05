@@ -68,7 +68,7 @@ questions:
     rows: 4
     required: false
 
-    - id: q1_stratégie_allocation
+  - id: q1_stratégie_allocation
     type: free_text
     label: "Avez-vous adopté une stratégie d'allocation des tâches ? Si oui, laquelle ?"
     label_en: "Did you adopt a task allocation strategy? If so, which one?"

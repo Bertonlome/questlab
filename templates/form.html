@@ -9,9 +9,20 @@
 <body>
   <div class="container">
 
+    <nav class="session-nav" aria-label="Questionnaire navigation">
+      <a class="nav-link nav-home" id="mainScreenLink" href="{{ url_for('index') }}">
+        <span aria-hidden="true">&#8592;</span> Main screen
+      </a>
+      {% if q_index > 0 %}
+      <a class="nav-link" href="{{ url_for('questionnaire', session_id=session_id, q_index=q_index - 1) }}">
+        Previous questionnaire
+      </a>
+      {% endif %}
+    </nav>
+
     <div class="session-header">
       <span>Participant: <strong>{{ participant }}</strong></span>
-      <span>{{ experiment.name }}{% if experiment.condition %} &mdash; {{ experiment.condition }}{% endif %}</span>
+      <span>{{ experiment.name }}{% if condition %} &mdash; {{ condition }}{% endif %}</span>
     </div>
 
     <div class="steps">
@@ -314,14 +325,31 @@
     </div>
   </div>
 
+  <div id="leaveDialog" class="leave-dialog-overlay" hidden role="dialog"
+       aria-modal="true" aria-labelledby="leaveDialogTitle" aria-describedby="leaveDialogText">
+    <div class="leave-dialog-panel">
+      <h2 id="leaveDialogTitle">Return to the main screen?</h2>
+      <p id="leaveDialogText">
+        This session already contains answers. They will remain saved as an incomplete
+        session, but selecting a study or condition again will start a new session.
+      </p>
+      <div class="leave-dialog-actions">
+        <button type="button" class="dialog-cancel-btn" id="leaveDialogCancel">Keep working</button>
+        <a class="dialog-leave-btn" id="leaveDialogConfirm" href="{{ url_for('index') }}">Return to main screen</a>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SESSION_ID       = {{ session_id | tojson }};
     const QUESTIONNAIRE_ID = {{ form_id | tojson }};
     const LIKERT_ANCHORS   = {{ LIKERT_ANCHORS | tojson }};
     const IS_FACILITATOR   = {{ (form.get('facilitator') or false) | tojson }};
     const EXPERIMENT_ID    = {{ experiment_id | tojson }};
+    const HAS_SAVED_ANSWERS = {{ has_answers | tojson }};
 
     let debounceTimers = {};
+    let pendingAnswers = {};
     let indicatorTimer = null;
 
     function showSaved(ok) {
@@ -333,9 +361,11 @@
     }
 
     function saveAnswer(questionId, value) {
+      delete pendingAnswers[questionId];
       fetch('/autosave', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
         body:    JSON.stringify({
           session_id:       SESSION_ID,
           questionnaire_id: QUESTIONNAIRE_ID,
@@ -350,10 +380,98 @@
 
     function debounce(questionId, value, delay) {
       clearTimeout(debounceTimers[questionId]);
+      pendingAnswers[questionId] = value;
       debounceTimers[questionId] = setTimeout(() => saveAnswer(questionId, value), delay);
     }
 
+    function flushPendingAnswers() {
+      Object.entries(pendingAnswers).forEach(([questionId, value]) => {
+        clearTimeout(debounceTimers[questionId]);
+        const payload = JSON.stringify({
+          session_id: SESSION_ID,
+          questionnaire_id: QUESTIONNAIRE_ID,
+          question_id: questionId,
+          value: value
+        });
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon('/autosave', new Blob([payload], { type: 'application/json' }));
+        } else {
+          fetch('/autosave', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: payload,
+            keepalive: true
+          });
+        }
+      });
+      pendingAnswers = {};
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+
+      // Returning home is immediate for an untouched session. Once an answer exists,
+      // explain exactly what happens before leaving the questionnaire flow.
+      const mainScreenLink   = document.getElementById('mainScreenLink');
+      const leaveDialog      = document.getElementById('leaveDialog');
+      const leaveDialogCancel = document.getElementById('leaveDialogCancel');
+      const leaveDialogConfirm = document.getElementById('leaveDialogConfirm');
+      let navigationApproved = false;
+
+      function pageContainsAnswer() {
+        if (HAS_SAVED_ANSWERS) return true;
+        return Array.from(document.querySelectorAll('.question input, .question textarea')).some(el => {
+          if (el.type === 'radio' || el.type === 'checkbox') return el.checked;
+          if (el.type === 'range') return !el.hasAttribute('data-pristine');
+          return String(el.value || '').trim() !== '';
+        });
+      }
+
+      if (mainScreenLink && leaveDialog) {
+        mainScreenLink.addEventListener('click', e => {
+          if (!pageContainsAnswer()) {
+            navigationApproved = true;
+            flushPendingAnswers();
+            return;
+          }
+          e.preventDefault();
+          leaveDialog.hidden = false;
+          document.body.style.overflow = 'hidden';
+          leaveDialogCancel.focus();
+        });
+        leaveDialogCancel.addEventListener('click', () => {
+          leaveDialog.hidden = true;
+          document.body.style.overflow = '';
+          mainScreenLink.focus();
+        });
+        leaveDialog.addEventListener('click', e => {
+          if (e.target === leaveDialog) leaveDialogCancel.click();
+        });
+        document.addEventListener('keydown', e => {
+          if (e.key === 'Escape' && !leaveDialog.hidden) leaveDialogCancel.click();
+        });
+        leaveDialogConfirm.addEventListener('click', () => {
+          navigationApproved = true;
+          flushPendingAnswers();
+        });
+      }
+
+      // Preserve debounced text when moving between questionnaires as well.
+      document.querySelectorAll('a.step-link, .session-nav a:not(#mainScreenLink)').forEach(link => {
+        link.addEventListener('click', () => {
+          navigationApproved = true;
+          flushPendingAnswers();
+        });
+      });
+
+      // Also cover browser Back, refresh, closing the tab, and external navigation.
+      window.addEventListener('beforeunload', e => {
+        if (navigationApproved) return;
+        const hasAnswer = pageContainsAnswer();
+        flushPendingAnswers();
+        if (!hasAnswer) return;
+        e.preventDefault();
+        e.returnValue = '';
+      });
 
       // Language toggle
       const langToggle = document.getElementById('langToggle');
@@ -446,6 +564,9 @@
           firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
           return;
         }
+
+        navigationApproved = true;
+        flushPendingAnswers();
 
         // Attention check — non-blocking; pass/fail is recorded server-side in the CSV
       });

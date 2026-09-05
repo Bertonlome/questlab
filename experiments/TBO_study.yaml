@@ -10,24 +10,24 @@ conditions:
   Baseline_low_complexity:
     questionnaires:
       - nasa_tlx_evaluation
-      - sart
+      - SART
       - sus
       - trust_in_decision_making
   Baseline_high_complexity:
     questionnaires:
       - nasa_tlx_evaluation
-      - sart
+      - SART
       - sus
       - trust_in_decision_making
   TBO_app_low_complexity:
     questionnaires:
       - nasa_tlx_evaluation
-      - sart
+      - SART
       - sus
       - trust_in_decision_making
   TBO_app_high_complexity:
     questionnaires:
       - nasa_tlx_evaluation
-      - sart
+      - SART
       - sus
       - trust_in_decision_making

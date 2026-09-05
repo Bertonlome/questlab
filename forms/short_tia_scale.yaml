@@ -1,5 +1,4 @@
-id:
-short_tia_scale
+id: short_tia_scale
 name: "Short Trust in Automation Scale"
 language: en
 instructions: >
@@ -27,33 +26,33 @@ attention_check:
 
 questions:
 
-  -id: sta_item_1
+  - id: sta_item_1
     type: likert5
     label: "I believe the autonomous system is a competent performer"
     anchors: *sta_anchors
     required: true
 
-  -id: sta_item_2
+  - id: sta_item_2
     type: likert5
     label: "I trust the autonomous system"
     anchors: *sta_anchors
     required: true
-  -id: sta_item_3
+  - id: sta_item_3
     type: likert5
     label: "I have confidence in the advice given by the autonomous system"
     anchors: *sta_anchors
     required: true
-  -id: sta_item_4
+  - id: sta_item_4
     type: likert5
     label: "I can depend on the autonomous system"
     anchors: *sta_anchors
     required: true
-  -id: sta_item_5
+  - id: sta_item_5
     type: likert5
     label: "I can rely on the autonomous system to behave in consistent ways"
     anchors: *sta_anchors
     required: true
-  -id: sta_item_6
+  - id: sta_item_6
     type: likert5
     label: "I can rely on the autonomous system to do its best every time I take its advice"
     anchors: *sta_anchors

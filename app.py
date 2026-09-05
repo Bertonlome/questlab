@@ -166,6 +166,38 @@ def _all_conditions():
     return {eid: _experiment_conditions(eid) for eid in _list_experiments()}
 
 
+def _completed_conditions(db, participant, experiment_id):
+    """Return conditions for which every questionnaire was submitted.
+
+    A session is created as soon as Start is pressed, so its existence alone does
+    not mean that the condition was completed (for example, the participant may
+    return home after selecting the wrong condition).
+    """
+    completed = set()
+    sessions = db.execute(
+        "SELECT session_id, condition, questionnaires FROM sessions "
+        "WHERE participant=? AND experiment_id=?",
+        (participant, experiment_id),
+    ).fetchall()
+
+    for candidate in sessions:
+        try:
+            questionnaires = json.loads(candidate["questionnaires"] or "[]")
+        except (json.JSONDecodeError, TypeError):
+            questionnaires = []
+        if not questionnaires:
+            continue
+
+        submitted = db.execute(
+            "SELECT COUNT(DISTINCT q_index) FROM completions WHERE session_id=?",
+            (candidate["session_id"],),
+        ).fetchone()[0]
+        if submitted >= len(questionnaires):
+            completed.add(candidate["condition"])
+
+    return completed
+
+
 # ── CSV helpers ───────────────────────────────────────────────────────────────
 
 _CSV_HEADERS = [
@@ -302,6 +334,11 @@ def questionnaire(session_id, q_index):
             (session_id, form_id),
         ).fetchall()
     }
+    has_answers = db.execute(
+        "SELECT 1 FROM answers WHERE session_id=? "
+        "AND value IS NOT NULL AND TRIM(value) NOT IN ('', '[]') LIMIT 1",
+        (session_id,),
+    ).fetchone() is not None
 
     # Load names for the timeline tooltip/labels (only the 'name' field needed)
     form_names = []
@@ -323,6 +360,8 @@ def questionnaire(session_id, q_index):
         form_names=form_names,
         existing=existing,
         participant=session["participant"],
+        condition=session["condition"],
+        has_answers=has_answers,
         attention_check_id=attention_check_id,
         attention_check_correct=attention_check_correct,
     )
@@ -428,7 +467,7 @@ def submit(session_id, q_index):
         (session_id, form_id, q_index, now),
     )
     db.execute(
-        "UPDATE sessions SET current_q=? WHERE session_id=?",
+        "UPDATE sessions SET current_q=MAX(current_q, ?) WHERE session_id=?",
         (q_index + 1, session_id),
     )
     db.commit()
@@ -454,12 +493,10 @@ def complete(session_id):
     experiment   = _load_experiment(session["experiment_id"])
     all_conds    = _experiment_conditions(session["experiment_id"])
 
-    # Find which conditions this participant has already completed
-    done_rows = db.execute(
-        "SELECT DISTINCT condition FROM sessions WHERE participant=? AND experiment_id=?",
-        (session["participant"], session["experiment_id"]),
-    ).fetchall()
-    done_conds = {r["condition"] for r in done_rows}
+    # A started/abandoned session must not make a condition look completed.
+    done_conds = _completed_conditions(
+        db, session["participant"], session["experiment_id"]
+    )
 
     # Next condition not yet started
     next_cond = next((c for c in all_conds if c not in done_conds), None)
